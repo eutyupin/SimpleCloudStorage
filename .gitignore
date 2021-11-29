@@ -1,4 +1,4 @@
 # Project exclude paths
 /client/target/
 /out/
-/server/target/
+/ru.simplecloudstorage.server/target/

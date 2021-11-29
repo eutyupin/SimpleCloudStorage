@@ -1,5 +1,6 @@
 package ru.simplecloudstorage.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -11,12 +12,20 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.utils.ErrorDialog;
+import ru.simplecloudstorage.utils.SceneName;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AuthDialog implements Initializable {
+
+    private final String ERROR = "Ошибка";
+    private final String ERROR_TITLE = "Не все поля заполнены";
+    private final String ERROR_DESCRIPTION = "Заполните все поля и повторите попытку авторизации";
+
+    @FXML
+    private Button settingsButton;
     @FXML
     private Label registerLink;
     @FXML
@@ -32,39 +41,40 @@ public class AuthDialog implements Initializable {
     }
 
     @FXML
-    public void regLinkClicked(MouseEvent mouseEvent) throws IOException {
-        ClientApp.setRoot("registerdialog");
+    private void regLinkClicked(MouseEvent mouseEvent) throws IOException {
+        ClientApp.setRoot(SceneName.REGISTER_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
     }
 
     @FXML
-    public void loginFieldKeyPressed(KeyEvent keyEvent) {
+    private void loginFieldKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER){
             passwordField.requestFocus();
         }
     }
 
     @FXML
-    public void passowrdFieldKeyPressed(KeyEvent keyEvent) {
+    private void passowrdFieldKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.ENTER)){
             okButton.requestFocus();
         }
     }
 
+    @FXML
+    private void okButtonKeyPressed(KeyEvent keyEvent) throws IOException {
+        loginActions();
+    }
+
+    @FXML
+    private void okButtonClicked(MouseEvent mouseEvent) throws IOException {
+        loginActions();
+    }
+
     private void loginActions() throws IOException {
         if (checkFieldsHaveText()) {
-            ClientApp.setRoot("mainwindow");
+            ClientApp.setRoot(SceneName.MAIN_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
         } else {
-            new ErrorDialog("Ошибка", "Не все поля заполнены","Заполните все поля " +
-                    "и повторите попытку авторизации");
+            new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
         }
-    }
-
-    public void okButtonKeyPressed(KeyEvent keyEvent) throws IOException {
-        loginActions();
-    }
-
-    public void okButtonClicked(MouseEvent mouseEvent) throws IOException {
-        loginActions();
     }
 
     private boolean checkFieldsHaveText() {
@@ -77,5 +87,10 @@ public class AuthDialog implements Initializable {
             return false;
         }
         return true;
+    }
+
+    @FXML
+    private void settingsButtonAction(ActionEvent actionEvent) {
+        ClientApp.setRoot(SceneName.SETTINGS_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
     }
 }

@@ -9,12 +9,15 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.utils.ErrorDialog;
+import ru.simplecloudstorage.utils.SceneName;
 
 import java.io.IOException;
 
 public class RegisterDialog {
 
-    private static TextField[] elementsCheckText = new TextField[4];
+    private final String ERROR = "Ошибка";
+    private final String ERROR_TITLE = "Не все поля заполнены";
+    private final String ERROR_DESCRIPTION = "Заполните все поля и повторите попытку регистрации";
 
     @FXML
     public TextField emailField;
@@ -29,47 +32,42 @@ public class RegisterDialog {
 
     @FXML
     private void cancelAction(ActionEvent actionEvent) throws IOException {
-        ClientApp.setRoot("authdialog");
+        ClientApp.setRoot(ClientApp.getFromScene(), SceneName.REGISTER_WINDOW.getValue());
     }
 
     @FXML
     private void pass2KeyTyped(KeyEvent keyEvent) {
-        if (!pass1.getText().equals(pass2.getText())) {
-            pass1.setStyle("-fx-background-color: #ffa3a3");
-            pass2.setStyle("-fx-background-color: #ffa3a3");
-        } else {
-            pass1.setStyle("-fx-background-color: #b0ffb3");
-            pass2.setStyle("-fx-background-color: #b0ffb3");
-        }
+      checkPasswordFieldsValue();
     }
 
     @FXML
     private void pass1KeyTyped(KeyEvent keyEvent) {
-        if (!pass1.getText().equals(pass2.getText())) {
-            pass1.setStyle("-fx-background-color: #ffa3a3");
-            pass2.setStyle("-fx-background-color: #ffa3a3");
-        } else {
-            pass1.setStyle("-fx-background-color: #b0ffb3");
-            pass2.setStyle("-fx-background-color: #b0ffb3");
-        }
+        checkPasswordFieldsValue();
     }
+
+
 
     @FXML
     private void emailKeyTyped(KeyEvent keyEvent) {
-        if (!emailField.getText().contains("@")) {
-            emailField.setStyle("-fx-background-color: #ffa3a3");
-        } else {
-            emailField.setStyle("-fx-background-color: #b0ffb3");
-        }
+        checkemailFieldValue();
     }
 
     private void registerAction() {
         if (checkFieldsHaveText()) {
 
         } else {
-            new ErrorDialog("Ошибка", "Не все поля заполнены","Заполните все поля " +
-                    "и повторите попытку регистрации");
+            new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
         }
+    }
+
+    @FXML
+    private void okPressed(KeyEvent keyEvent) {
+        registerAction();
+    }
+
+    @FXML
+    private void okClick(MouseEvent mouseEvent) {
+        registerAction();
     }
 
     private boolean checkFieldsHaveText() {
@@ -92,13 +90,21 @@ public class RegisterDialog {
         return true;
     }
 
-    @FXML
-    private void okPressed(KeyEvent keyEvent) {
-        registerAction();
+    private void checkPasswordFieldsValue() {
+        if (!pass1.getText().equals(pass2.getText())) {
+            pass1.setStyle("-fx-background-color: #ffa3a3");
+            pass2.setStyle("-fx-background-color: #ffa3a3");
+        } else {
+            pass1.setStyle("-fx-background-color: #b0ffb3");
+            pass2.setStyle("-fx-background-color: #b0ffb3");
+        }
     }
 
-    @FXML
-    private void okClick(MouseEvent mouseEvent) {
-        registerAction();
+    private void checkemailFieldValue() {
+        if (!emailField.getText().contains("@")) {
+            emailField.setStyle("-fx-background-color: #ffa3a3");
+        } else {
+            emailField.setStyle("-fx-background-color: #b0ffb3");
+        }
     }
 }
