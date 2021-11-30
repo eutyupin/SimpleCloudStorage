@@ -5,22 +5,37 @@ import ru.simplecloudstorage.commands.*;
 import java.sql.*;
 
 public class AuthorizeService {
+
+    private final String DB_URL = "jdbc:sqlite:C:/Users/Jeka/IdeaProjects/SimpleCloudStorage/server/db/base.db";
+    private String errorMessage;
+
     public BaseCommand tryAuthorize(String login, String password) {
         AuthOkCommand authOkCommand = new AuthOkCommand();
         AuthFailedCommand authFailedCommand = new AuthFailedCommand();
-        authFailedCommand.setMessage("Wrong login or user name. Please check, or regisner.");
-        boolean wrightLogin = false;
-        boolean wrightPassword = false;
-        try (Connection connection = DriverManager.getConnection("db/base.db")) {
+        errorMessage = "Неверный логин или пароль. Попробуйте еще раз или зарегистрируйтесь.";
+        authFailedCommand.setMessage(errorMessage);
+        boolean correctLogin = false;
+        boolean correctPassword = false;
+        try (Connection connection = DriverManager.getConnection(DB_URL)) {
             Statement statement = connection.createStatement();
-            String queryString = String.format("SELECT username FROM logins WHERE user_login = \'%s\' AND user_password = \'%s\'", login, password);
+            String queryString = String.format("SELECT login_value, password_value " +
+                    "FROM login JOIN password on login.login_value = \'%s\' " +
+                    "AND password.password_value = \'%s\' " +
+                    "AND login.id = password.login_value_id;", login, password);
             ResultSet resultSet = statement.executeQuery(queryString);
-            wrightLogin = login.equals(resultSet.getString(1));
-            wrightPassword = password.equals(resultSet.getString(2));
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            if (resultSet.next()) {
+                correctLogin = login.equals(resultSet.getString(1));
+                correctPassword = password.equals(resultSet.getString(2));
+            } else {
+                correctLogin = false;
+                correctPassword = false;
+                System.out.println("Error: " + errorMessage);
+            }
+        } catch (SQLException e) {
+           correctLogin = false;
+           correctPassword = false;
         }
-        if (wrightLogin && wrightPassword) return authOkCommand;
+        if (correctLogin && correctPassword) return authOkCommand;
         else return authFailedCommand;
     }
 

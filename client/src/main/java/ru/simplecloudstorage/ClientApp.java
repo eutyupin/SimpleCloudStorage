@@ -56,14 +56,14 @@ public class ClientApp extends Application {
         authStage = new Stage();
         authStage.initOwner(primaryStage);
         authStage.initModality(Modality.WINDOW_MODAL);
-//        authStage.initStyle(StageStyle.UNDECORATED);
+        authStage.setResizable(false);
         authStage.setScene(authScene);
         authController = authLoader.getController();
         authController.setClientApp(this);
         authController.setConnector(connector);
         authController.setAuthStage(authStage);
         connecting();
-        authStage.showAndWait();
+        authStage.show();
     }
     public void authDialogClose() {
         Platform.runLater(() -> {
@@ -111,8 +111,7 @@ public class ClientApp extends Application {
     }
 
     private void closeRequestCheck() {
-        primaryStage.setOnCloseRequest( event ->
-        {
+        primaryStage.setOnCloseRequest( event -> {
             connector.connectorShutdown();
         });
 //        authStage.setOnHiding(windowEvent -> {
@@ -130,7 +129,7 @@ public class ClientApp extends Application {
         return fromScene;
     }
 
-    public Stage getAuthStage() {
-        return authStage;
+    public AuthDialog getAuthDialog() {
+        return authController;
     }
 }

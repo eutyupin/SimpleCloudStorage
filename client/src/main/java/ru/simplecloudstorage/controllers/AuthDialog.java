@@ -71,10 +71,8 @@ public class AuthDialog {
     }
 
     private void loginActions() {
-//        System.out.println("ok button");
         if (checkFieldsHaveText()) {
             connector.authorize(loginField.getText(), passwordField.getText());
-//            clientApp.getAuthStage().close();
 
         } else {
             new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
@@ -96,6 +94,12 @@ public class AuthDialog {
     @FXML
     private void settingsButtonAction(ActionEvent actionEvent) {
         ClientApp.authDialogSetRoot(SceneName.SETTINGS_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
+    }
+
+    public void prepareFieldsForLogin() {
+        loginField.clear();
+        passwordField.clear();
+        loginField.requestFocus();
     }
 
     public void setAuthStage(Stage authStage) {

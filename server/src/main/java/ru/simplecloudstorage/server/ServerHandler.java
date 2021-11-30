@@ -4,10 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ru.simplecloudstorage.commands.*;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
 public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
@@ -33,10 +29,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void checkAuthCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
         if (command.getType().equals(CommandType.AUTH)) {
             AuthCommand authCommand = (AuthCommand) command;
-            System.out.println("AuthCommand received " + System.lineSeparator() + "Login: " +
-                    authCommand.getLogin() + System.lineSeparator() + "Password: " + authCommand.getPassword());
-            channelHandlerContext.writeAndFlush(new AuthOkCommand());
-
+            AuthorizeService authorizeService = new AuthorizeService();
+            channelHandlerContext.writeAndFlush(authorizeService.tryAuthorize(authCommand.getLogin(),
+                    authCommand.getPassword()));
         }
     }
 
