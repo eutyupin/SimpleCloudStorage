@@ -1,0 +1,6 @@
+package ru.simplecloudstorage.commands;
+
+public enum CommandType {
+    DOWNLOAD_REQUEST, DOWNLOAD_FILE, UPLOAD_FILE, REGISTER, AUTH, AUTH_OK, AUTH_FAILED,
+    SERVER_FILE_LIST, REGISTER_OK, REGISTER_FALIED
+}

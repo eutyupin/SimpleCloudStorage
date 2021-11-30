@@ -2,26 +2,26 @@ package ru.simplecloudstorage;
 
 import ru.simplecloudstorage.server.ServerConnector;
 
-public class MainServer {
+public class ServerApp {
 
 
     public static void main(String[] args) {
         startServer(args);
     }
 
-    private static void setPortFromArgs(String[] args) {
+    private static void argumentSetParameters(String[] args) {
         if (args.length > 0) {
             try {
                 ServerConnector.setPort(Integer.parseInt(args[0]));
             } catch (NumberFormatException e) {
-                System.err.println("Введенный параметр порта не является числом." + System.lineSeparator()+
-                        "Сервер запущен на порту по умолчанию - 9000" + System.lineSeparator());
+                System.out.println("Entered port number is not a digit." + System.lineSeparator()+
+                        "Server will started with default port number - 9000" + System.lineSeparator());
             }
         } else ServerConnector.setPort(ServerConnector.getDefaultPortValue());
     }
 
     private static void startServer(String[] args) {
-        setPortFromArgs(args);
+        argumentSetParameters(args);
         try {
             new ServerConnector().run();
         } catch (InterruptedException e) {

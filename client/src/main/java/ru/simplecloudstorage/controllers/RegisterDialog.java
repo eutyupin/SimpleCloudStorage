@@ -32,7 +32,7 @@ public class RegisterDialog {
 
     @FXML
     private void cancelAction(ActionEvent actionEvent) throws IOException {
-        ClientApp.setRoot(ClientApp.getFromScene(), SceneName.REGISTER_WINDOW.getValue());
+        ClientApp.authDialogSetRoot(ClientApp.getFromScene(), SceneName.REGISTER_WINDOW.getValue());
     }
 
     @FXML

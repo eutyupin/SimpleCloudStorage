@@ -2,7 +2,6 @@ package ru.simplecloudstorage.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -10,15 +9,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import ru.simplecloudstorage.ClientApp;
+import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
-public class AuthDialog implements Initializable {
+public class AuthDialog {
 
     private final String ERROR = "Ошибка";
     private final String ERROR_TITLE = "Не все поля заполнены";
@@ -34,15 +33,17 @@ public class AuthDialog implements Initializable {
     private TextField loginField;
     @FXML
     private PasswordField passwordField;
+    private ClientApp clientApp;
+    private ClientConnector connector;
+    private Stage authStage;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        loginField.requestFocus();
+    public void setClientApp(ClientApp clientApp) {
+        this.clientApp = clientApp;
     }
 
     @FXML
     private void regLinkClicked(MouseEvent mouseEvent) throws IOException {
-        ClientApp.setRoot(SceneName.REGISTER_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
+        ClientApp.authDialogSetRoot(SceneName.REGISTER_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
     }
 
     @FXML
@@ -69,9 +70,12 @@ public class AuthDialog implements Initializable {
         loginActions();
     }
 
-    private void loginActions() throws IOException {
+    private void loginActions() {
+//        System.out.println("ok button");
         if (checkFieldsHaveText()) {
-            ClientApp.setRoot(SceneName.MAIN_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
+            connector.authorize(loginField.getText(), passwordField.getText());
+//            clientApp.getAuthStage().close();
+
         } else {
             new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
         }
@@ -91,6 +95,14 @@ public class AuthDialog implements Initializable {
 
     @FXML
     private void settingsButtonAction(ActionEvent actionEvent) {
-        ClientApp.setRoot(SceneName.SETTINGS_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
+        ClientApp.authDialogSetRoot(SceneName.SETTINGS_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
+    }
+
+    public void setAuthStage(Stage authStage) {
+        this.authStage = authStage;
+    }
+
+    public void setConnector(ClientConnector connector) {
+        this.connector = connector;
     }
 }
