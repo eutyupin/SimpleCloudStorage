@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -68,16 +69,6 @@ public class RegisterDialog {
         }
     }
 
-    @FXML
-    private void okPressed(KeyEvent keyEvent) {
-        registerAction();
-    }
-
-    @FXML
-    private void okClick(MouseEvent mouseEvent) {
-        registerAction();
-    }
-
     private boolean checkFieldsHaveText() {
         if (loginField.getText().isEmpty()) {
             loginField.requestFocus();
@@ -113,6 +104,39 @@ public class RegisterDialog {
             emailField.setStyle("-fx-background-color: #ffa3a3");
         } else {
             emailField.setStyle("-fx-background-color: #b0ffb3");
+        }
+    }
+
+    @FXML
+    public void okAction(ActionEvent actionEvent) {
+        registerAction();
+    }
+
+    @FXML
+    public void loginFieldKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER){
+            pass1.requestFocus();
+        }
+    }
+
+    @FXML
+    public void pass1KeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER){
+            pass2.requestFocus();
+        }
+    }
+
+    @FXML
+    public void pass2KeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER){
+            emailField.requestFocus();
+        }
+    }
+
+    @FXML
+    public void emailKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER){
+            okButton.requestFocus();
         }
     }
 }
