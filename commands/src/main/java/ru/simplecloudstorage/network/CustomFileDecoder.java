@@ -1,4 +1,4 @@
-package ru.simplecloudstorage.adapter;
+package ru.simplecloudstorage.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;

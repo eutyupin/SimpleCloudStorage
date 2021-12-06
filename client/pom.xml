@@ -20,6 +20,36 @@
             <artifactId>javafx-fxml</artifactId>
             <version>11.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>4.1.70.Final</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>4.1.70.Final</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.simplecloudstorage</groupId>
+            <artifactId>commands</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.simplecloudstorage</groupId>
+            <artifactId>server</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -41,7 +71,7 @@
                         <!-- Usage: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>ru.simplecloudstorage.MainServer</mainClass>
+                            <mainClass>ru.simplecloudstorage.ClientApp</mainClass>
                         </configuration>
                     </execution>
                 </executions>
@@ -58,7 +88,7 @@
                         <configuration>
                             <classifier>spring-boot</classifier>
                             <mainClass>
-                                ru.simplecloudstorage.Main
+                                ru.simplecloudstorage.ClientApp
                             </mainClass>
                         </configuration>
                     </execution>
@@ -77,7 +107,7 @@
 <!--                            <transformers>-->
 <!--                                <transformer implementation=-->
 <!--                                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
-<!--                                    <mainClass>ru.simplecloudstorage.MainServer</mainClass>-->
+<!--                                    <mainClass>ru.simplecloudstorage.ServerApp</mainClass>-->
 <!--                                </transformer>-->
 <!--                            </transformers>-->
 <!--                        </configuration>-->

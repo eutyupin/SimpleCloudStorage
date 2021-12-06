@@ -1,7 +1,5 @@
 package ru.simplecloudstorage.server;
 
-import ru.simplecloudstorage.adapter.CustomFileDecoder;
-import ru.simplecloudstorage.adapter.CustomFileEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -11,6 +9,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import ru.simplecloudstorage.network.CustomFileDecoder;
+import ru.simplecloudstorage.network.CustomFileEncoder;
 
 public class ServerConnector {
     private static int port;
@@ -39,7 +39,8 @@ public class ServerConnector {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             Channel channel = server.bind(port).sync().channel();
-            System.out.println("Simple Cloud Storage Server started...");
+            System.out.println("Simple Cloud Storage Server started..." +
+                    System.lineSeparator() + "Server port is: " + port);
             channel.closeFuture().sync();
         } finally {
             {

@@ -12,6 +12,6 @@ public class SettingsWindow {
     }
 
     public void cancelButtonAction(ActionEvent actionEvent) {
-        ClientApp.setRoot(ClientApp.getFromScene(), SceneName.SETTINGS_WINDOW.getValue());
+        ClientApp.authDialogSetRoot(ClientApp.getFromScene(), SceneName.SETTINGS_WINDOW.getValue());
     }
 }
