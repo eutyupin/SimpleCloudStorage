@@ -3,6 +3,8 @@ package ru.simplecloudstorage.server;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ru.simplecloudstorage.commands.*;
+import ru.simplecloudstorage.services.AuthorizeService;
+import ru.simplecloudstorage.services.RegisterService;
 
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -30,6 +32,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             checkDownloadRequestCommand(command, channelHandlerContext);
             checkUploadFileCommand(command, channelHandlerContext);
             checkAuthCommand(command, channelHandlerContext);
+            checkRegisterCommand(command, channelHandlerContext);
     }
 
     private void checkAuthCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
@@ -40,6 +43,21 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 channelHandlerContext.writeAndFlush(authorizeService.tryAuthorize(authCommand.getLogin(),
                         authCommand.getPasswordHash(), DB_URL));
             } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
+
+    private void checkRegisterCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
+        if (command.getType().equals(CommandType.REGISTER)) {
+            RegisterCommand registerCommand = (RegisterCommand) command;
+            RegisterService registerService = new RegisterService();
+            try {
+                System.out.println("User: " + registerCommand.getLogin() + " trying register");
+                channelHandlerContext.writeAndFlush(registerService.tryRegister(registerCommand.getLogin(), registerCommand.getPasswordHash(),
+                        registerCommand.getEmail(), DB_URL));
+
+            }catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
         }

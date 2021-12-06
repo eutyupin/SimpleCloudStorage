@@ -10,13 +10,13 @@ public class DBCheckOrCreate {
         try (Connection checkConnection = DriverManager.getConnection(dbURL)) {
             checkStatement = checkConnection.createStatement();
 
-            checkStatement.execute("CREATE TABLE if not exists login (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, " +
+            checkStatement.execute("CREATE TABLE IF NOT EXISTS login (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, " +
                     "login_value STRING UNIQUE NOT NULL);");
 
-            checkStatement.execute("CREATE TABLE if not exists password (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, " +
+            checkStatement.execute("CREATE TABLE IF NOT EXISTS password (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, " +
                     "login_value_id INTEGER REFERENCES login (id) NOT NULL, password_value INTEGER NOT NULL);");
 
-            checkStatement.execute("CREATE TABLE if not exists email (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, " +
+            checkStatement.execute("CREATE TABLE IF NOT EXISTS email (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, " +
                     "login_value_id INTEGER REFERENCES login (id) NOT NULL, email STRING NOT NULL);");
 
         } catch (SQLException e) {

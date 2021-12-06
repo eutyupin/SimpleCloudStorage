@@ -7,7 +7,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import ru.simplecloudstorage.ClientApp;
+import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
@@ -19,6 +21,8 @@ public class RegisterDialog {
     private final String ERROR_TITLE = "Не все поля заполнены";
     private final String ERROR_DESCRIPTION = "Заполните все поля и повторите попытку регистрации";
 
+    private static ClientConnector connector;
+
     @FXML
     public TextField emailField;
     @FXML
@@ -29,6 +33,10 @@ public class RegisterDialog {
     private PasswordField pass2;
     @FXML
     private PasswordField pass1;
+
+    public static void setConnector(ClientConnector clientConnector) {
+        connector = clientConnector;
+    }
 
     @FXML
     private void cancelAction(ActionEvent actionEvent) throws IOException {
@@ -54,7 +62,7 @@ public class RegisterDialog {
 
     private void registerAction() {
         if (checkFieldsHaveText()) {
-
+            connector.userRegister(loginField.getText(), pass1.getText().hashCode(), emailField.getText());
         } else {
             new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
         }

@@ -2,15 +2,13 @@ package ru.simplecloudstorage.utils;
 
 import javafx.scene.control.Alert;
 
-public class ErrorDialog extends Alert {
+public class InformationDialog extends Alert {
 
-    public ErrorDialog(String title, String header, String contentText) {
-        super(AlertType.ERROR);
+    public InformationDialog(String title, String header, String contentText) {
+        super(AlertType.INFORMATION);
         this.setTitle(title);
         this.setHeaderText(header);
         this.setContentText(contentText);
         this.showAndWait();
     }
-
-
 }

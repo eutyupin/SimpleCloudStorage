@@ -1,4 +1,4 @@
-package ru.simplecloudstorage.server;
+package ru.simplecloudstorage.services;
 
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.util.DBCheckOrCreate;
@@ -11,10 +11,8 @@ public class AuthorizeService {
 
     public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
         DBCheckOrCreate.tryCheckOrCreate(dbURL);
-
         AuthOkCommand authOkCommand = new AuthOkCommand();
         AuthFailedCommand authFailedCommand = new AuthFailedCommand();
-
         String errorMessage = "Неверный логин или пароль. Попробуйте еще раз или зарегистрируйтесь.";
         authFailedCommand.setMessage(errorMessage);
         boolean correctLogin = false;
@@ -42,7 +40,10 @@ public class AuthorizeService {
             statement.close();
             resultSet.close();
         }
-        if (correctLogin && correctPassword) return authOkCommand;
+        if (correctLogin && correctPassword) {
+            System.out.println("User: " + login + " logging OK.");
+            return authOkCommand;
+        }
         else return authFailedCommand;
     }
 

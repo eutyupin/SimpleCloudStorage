@@ -83,12 +83,19 @@ public class ClientConnector {
         clientChannel.writeAndFlush(downloadRequestCommand);
     }
 
-    public void authorize(String login, int passwordHash) {
+    public void userAuthorize(String login, int passwordHash) {
         AuthCommand authCommand = new AuthCommand();
         authCommand.setLogin(login);
         authCommand.setPasswordHash(passwordHash);
         clientChannel.writeAndFlush(authCommand);
+    }
 
+    public void userRegister(String login, int passwordHash, String email) {
+        RegisterCommand registerCommand = new RegisterCommand();
+        registerCommand.setLogin(login);
+        registerCommand.setPasswordHash(passwordHash);
+        registerCommand.setEmail(email);
+        clientChannel.writeAndFlush(registerCommand);
     }
 
     public static void setConnectParameters() {

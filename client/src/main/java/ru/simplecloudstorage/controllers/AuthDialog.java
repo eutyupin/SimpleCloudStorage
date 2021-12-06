@@ -34,7 +34,7 @@ public class AuthDialog {
     @FXML
     private PasswordField passwordField;
     private ClientApp clientApp;
-    private ClientConnector connector;
+    private static ClientConnector connector;
     private Stage authStage;
 
     public void setClientApp(ClientApp clientApp) {
@@ -72,7 +72,7 @@ public class AuthDialog {
 
     private void loginActions() {
         if (checkFieldsHaveText()) {
-            connector.authorize(loginField.getText(), passwordField.getText().hashCode());
+            connector.userAuthorize(loginField.getText(), passwordField.getText().hashCode());
 
         } else {
             new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
@@ -106,7 +106,8 @@ public class AuthDialog {
         this.authStage = authStage;
     }
 
-    public void setConnector(ClientConnector connector) {
-        this.connector = connector;
+    public void setConnector(ClientConnector clientConnector) {
+        connector = clientConnector;
+        RegisterDialog.setConnector(clientConnector);
     }
 }
