@@ -4,7 +4,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ru.simplecloudstorage.commands.*;
 
+import java.nio.file.Paths;
+import java.sql.SQLException;
+
 public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
+
+    private final String DB_URL = "jdbc:sqlite:" + Paths.get("./").toUri().normalize().toString().substring(6) + "base.db";
+
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Client trying to connect... Waiting authorization...");
@@ -21,17 +27,21 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     }
 
     private void checkCommands(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
-        checkDownloadRequestCommand(command, channelHandlerContext);
-        checkUploadFileCommand(command, channelHandlerContext);
-        checkAuthCommand(command, channelHandlerContext);
+            checkDownloadRequestCommand(command, channelHandlerContext);
+            checkUploadFileCommand(command, channelHandlerContext);
+            checkAuthCommand(command, channelHandlerContext);
     }
 
     private void checkAuthCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
         if (command.getType().equals(CommandType.AUTH)) {
             AuthCommand authCommand = (AuthCommand) command;
             AuthorizeService authorizeService = new AuthorizeService();
-            channelHandlerContext.writeAndFlush(authorizeService.tryAuthorize(authCommand.getLogin(),
-                    authCommand.getPasswordHash()));
+            try {
+                channelHandlerContext.writeAndFlush(authorizeService.tryAuthorize(authCommand.getLogin(),
+                        authCommand.getPasswordHash(), DB_URL));
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 

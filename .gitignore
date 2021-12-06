@@ -4,6 +4,7 @@
 /server/target/
 /out/
 *.log
+*.db
 
 HELP.md
 target/

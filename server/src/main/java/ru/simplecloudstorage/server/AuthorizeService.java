@@ -1,28 +1,31 @@
 package ru.simplecloudstorage.server;
 
 import ru.simplecloudstorage.commands.*;
-
+import ru.simplecloudstorage.util.DBCheckOrCreate;
 import java.sql.*;
 
 public class AuthorizeService {
 
-    private final String DB_URL = "jdbc:sqlite:C:/Users/Jeka/IdeaProjects/SimpleCloudStorage/server/db/base.db";
-    private String errorMessage;
+    private  Statement statement;
+    private ResultSet resultSet;
 
-    public BaseCommand tryAuthorize(String login, int passwordHash) {
+    public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
+        DBCheckOrCreate.tryCheckOrCreate(dbURL);
+
         AuthOkCommand authOkCommand = new AuthOkCommand();
         AuthFailedCommand authFailedCommand = new AuthFailedCommand();
-        errorMessage = "Неверный логин или пароль. Попробуйте еще раз или зарегистрируйтесь.";
+
+        String errorMessage = "Неверный логин или пароль. Попробуйте еще раз или зарегистрируйтесь.";
         authFailedCommand.setMessage(errorMessage);
         boolean correctLogin = false;
         boolean correctPassword = false;
-        try (Connection connection = DriverManager.getConnection(DB_URL)) {
-            Statement statement = connection.createStatement();
+        try (Connection connection = DriverManager.getConnection(dbURL)) {
+            statement = connection.createStatement();
             String queryString = String.format("SELECT login_value, password_value " +
                     "FROM login JOIN password on login.login_value = \'%s\' " +
                     "AND password.password_value = %d " +
                     "AND login.id = password.login_value_id;", login, passwordHash);
-            ResultSet resultSet = statement.executeQuery(queryString);
+            resultSet = statement.executeQuery(queryString);
             if (resultSet.next()) {
                 correctLogin = login.equals(resultSet.getString(1));
                 correctPassword = passwordHash == resultSet.getInt(2);
@@ -34,6 +37,10 @@ public class AuthorizeService {
         } catch (SQLException e) {
            correctLogin = false;
            correctPassword = false;
+        }
+        finally {
+            statement.close();
+            resultSet.close();
         }
         if (correctLogin && correctPassword) return authOkCommand;
         else return authFailedCommand;
