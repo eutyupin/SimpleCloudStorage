@@ -22,11 +22,7 @@ public class AuthDialog {
     private final String ERROR = "Ошибка";
     private final String ERROR_TITLE = "Не все поля заполнены";
     private final String ERROR_DESCRIPTION = "Заполните все поля и повторите попытку авторизации";
-
-    @FXML
-    private Button settingsButton;
-    @FXML
-    private Label registerLink;
+    
     @FXML
     private Button okButton;
     @FXML

@@ -14,9 +14,6 @@ import java.io.IOException;
 
 public class MainWindow {
 
-//    private final String ERROR = "Ошибка";
-//    private final String ERROR_TITLE = "Ошибка при выполнении";
-
     @FXML
     public MenuItem settingsMenu;
     @FXML

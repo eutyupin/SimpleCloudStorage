@@ -7,8 +7,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.utils.ErrorDialog;
