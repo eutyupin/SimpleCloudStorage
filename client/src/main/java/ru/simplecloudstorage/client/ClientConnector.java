@@ -83,10 +83,10 @@ public class ClientConnector {
         clientChannel.writeAndFlush(downloadRequestCommand);
     }
 
-    public void authorize(String login, String password) {
+    public void authorize(String login, int passwordHash) {
         AuthCommand authCommand = new AuthCommand();
         authCommand.setLogin(login);
-        authCommand.setPassword(password);
+        authCommand.setPasswordHash(passwordHash);
         clientChannel.writeAndFlush(authCommand);
 
     }

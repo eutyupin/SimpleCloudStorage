@@ -31,7 +31,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             AuthCommand authCommand = (AuthCommand) command;
             AuthorizeService authorizeService = new AuthorizeService();
             channelHandlerContext.writeAndFlush(authorizeService.tryAuthorize(authCommand.getLogin(),
-                    authCommand.getPassword()));
+                    authCommand.getPasswordHash()));
         }
     }
 

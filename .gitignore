@@ -1,4 +1,40 @@
 # Project exclude paths
 /client/target/
+/commands/target/
+/server/target/
 /out/
-/ru.simplecloudstorage.server/target/
+*.log
+
+HELP.md
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+.mvn
+
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+

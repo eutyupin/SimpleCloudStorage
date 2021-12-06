@@ -72,7 +72,7 @@ public class AuthDialog {
 
     private void loginActions() {
         if (checkFieldsHaveText()) {
-            connector.authorize(loginField.getText(), passwordField.getText());
+            connector.authorize(loginField.getText(), passwordField.getText().hashCode());
 
         } else {
             new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);

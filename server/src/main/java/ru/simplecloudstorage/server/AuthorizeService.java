@@ -9,7 +9,7 @@ public class AuthorizeService {
     private final String DB_URL = "jdbc:sqlite:C:/Users/Jeka/IdeaProjects/SimpleCloudStorage/server/db/base.db";
     private String errorMessage;
 
-    public BaseCommand tryAuthorize(String login, String password) {
+    public BaseCommand tryAuthorize(String login, int passwordHash) {
         AuthOkCommand authOkCommand = new AuthOkCommand();
         AuthFailedCommand authFailedCommand = new AuthFailedCommand();
         errorMessage = "Неверный логин или пароль. Попробуйте еще раз или зарегистрируйтесь.";
@@ -20,12 +20,12 @@ public class AuthorizeService {
             Statement statement = connection.createStatement();
             String queryString = String.format("SELECT login_value, password_value " +
                     "FROM login JOIN password on login.login_value = \'%s\' " +
-                    "AND password.password_value = \'%s\' " +
-                    "AND login.id = password.login_value_id;", login, password);
+                    "AND password.password_value = %d " +
+                    "AND login.id = password.login_value_id;", login, passwordHash);
             ResultSet resultSet = statement.executeQuery(queryString);
             if (resultSet.next()) {
                 correctLogin = login.equals(resultSet.getString(1));
-                correctPassword = password.equals(resultSet.getString(2));
+                correctPassword = passwordHash == resultSet.getInt(2);
             } else {
                 correctLogin = false;
                 correctPassword = false;
