@@ -46,16 +46,4 @@ public class AuthorizeService {
         }
         else return authFailedCommand;
     }
-
-/* In perspective */
-
-//    public BaseCommand register(String login, String password, String email) {
-//
-//        RegisterOkCommnad registerOkCommnad = new RegisterOkCommnad();
-//        RegisterFailedCommand registerFailedCommand = new RegisterFailedCommand();
-//        registerFailedCommand.setMessage("");
-//
-//        if (true) return registerOkCommnad;
-//        else return registerFailedCommand;
-//    }
 }
