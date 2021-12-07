@@ -6,16 +6,21 @@
 
 <BorderPane fx:id="mainPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onZoom="#paneZoom" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.simplecloudstorage.controllers.MainWindow">
    <top>
-      <MenuBar BorderPane.alignment="CENTER">
+      <MenuBar nodeOrientation="RIGHT_TO_LEFT" BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="Файл">
-            <items>
-              <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeMenuItemAction" text="Выход" />
-            </items>
-          </Menu>
+            <Menu mnemonicParsing="false">
+               <graphic>
+                  <ComboBox fx:id="diskBox" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="90.0" />
+               </graphic>
+            </Menu>
           <Menu mnemonicParsing="false" text="Опции">
             <items>
               <MenuItem fx:id="settingsMenu" mnemonicParsing="false" onAction="#SettingsAction" text="Нстройки соединения" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Файл">
+            <items>
+              <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeMenuItemAction" text="Выход" />
             </items>
           </Menu>
         </menus>

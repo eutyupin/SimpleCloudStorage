@@ -139,4 +139,8 @@ public class ClientApp extends Application {
     public void mainWindowSetDownloader(ClientDownloader clientDownloader) {
         primaryController.setDownloader(clientDownloader);
     }
+
+    public MainWindow getMainWindow() {
+        return primaryController;
+    }
 }

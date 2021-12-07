@@ -1,24 +1,34 @@
 package ru.simplecloudstorage.controllers;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.client.ClientDownloader;
 import ru.simplecloudstorage.utils.SceneName;
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
-public class MainWindow {
+public class MainWindow implements Initializable {
 
     @FXML
     public MenuItem settingsMenu;
     @FXML
     public Button uploadButton;
+    @FXML
+    public ComboBox diskBox;
     @FXML
     private BorderPane mainPane;
     @FXML
@@ -31,6 +41,32 @@ public class MainWindow {
     private HBox rightPane;
     private ClientApp application;
     private ClientDownloader clientDownloader;
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+       diskBoxInit();
+       rightViewInit();
+    }
+
+    public void rightViewInit() {
+        Platform.runLater(() -> createRightViewTree(diskBox.getValue().toString()));
+    }
+
+
+    private void diskBoxInit() {
+        diskBox.setItems(diskListCreate());
+        diskBox.getSelectionModel().select(0);
+    }
+
+    private ObservableList diskListCreate() {
+        File[] paths;
+        ObservableList<String> disksList = FXCollections.observableArrayList();
+        paths = File.listRoots();
+        for (File path : paths) {
+            disksList.add(path.toString().substring(0,2));
+        }
+        return disksList;
+    }
 
 
     @FXML
@@ -65,7 +101,32 @@ public class MainWindow {
         this.clientDownloader = clientDownloader;
     }
 
-    public static void updatePCView(TreeItem<String> item) {
-
+    private void createRightViewTree(String disk) {
+        Path rootDisk = Paths.get(disk + "\\").toAbsolutePath().normalize();
+        TreeItem<String> rootUserItem = new TreeItem<>(rootDisk.getFileName().toString());
+        rightView.setShowRoot(false);
+        fillFilesTree(rootDisk.toFile(), rootUserItem);
+        rightView.setRoot(rootUserItem);
     }
+
+    private void fillFilesTree(File target, TreeItem<String> item) {
+        Image folder = new Image("folder.png");
+        Image file = new Image("file.png");
+        ImageView folderIcon = new ImageView(folder); //new ImageView(new Image(getClass().getResourceAsStream("folder.png")));
+        ImageView fileIcon = new ImageView(file); //new ImageView(new Image(getClass().getResourceAsStream("file.png")));
+
+        if (target.isDirectory() && target.canRead()) {
+            TreeItem<String> treeItem = new TreeItem<>(target.getName());
+            treeItem.setGraphic(folderIcon);
+            item.getChildren().add(treeItem);
+            for (File element : target.listFiles()) {
+                fillFilesTree(element,treeItem);
+            }
+        } else {
+            TreeItem<String> treeItem = new TreeItem<>(target.getName());
+            treeItem.setGraphic(fileIcon);
+            item.getChildren().add(treeItem);
+        }
+    }
+
 }
