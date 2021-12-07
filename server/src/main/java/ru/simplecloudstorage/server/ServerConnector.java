@@ -12,6 +12,9 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import ru.simplecloudstorage.network.CustomFileDecoder;
 import ru.simplecloudstorage.network.CustomFileEncoder;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ServerConnector {
     private static int port;
     private static final int DEFAULT_PORT_VALUE = 9000;
@@ -19,6 +22,8 @@ public class ServerConnector {
     public void run() throws InterruptedException {
         NioEventLoopGroup connectorGroup = new NioEventLoopGroup(1);
         NioEventLoopGroup workGroup = new NioEventLoopGroup();
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        ServerHandler serverHandler = new ServerHandler(threadPool);
         try {
             ServerBootstrap server = new ServerBootstrap()
                     .group(connectorGroup, workGroup)
@@ -27,12 +32,12 @@ public class ServerConnector {
                         @Override
                         protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
                             nioSocketChannel.pipeline().addLast(
-                                    new LengthFieldBasedFrameDecoder(1024*1024, 0,
+                                    new LengthFieldBasedFrameDecoder(1024*128, 0,
                                             2,0,2),
                                     new LengthFieldPrepender(2),
                                     new CustomFileEncoder(),
                                     new CustomFileDecoder(),
-                                    new ServerHandler()
+                                    serverHandler
                             );
                         }
                     })
@@ -46,12 +51,11 @@ public class ServerConnector {
             {
                 connectorGroup.shutdownGracefully();
                 workGroup.shutdownGracefully();
+                threadPool.shutdownNow();
                 System.out.println("Simple Cloud Storage Server stopped!...");
             }
         }
     }
-
-
 
     public static int getDefaultPortValue() {
         return DEFAULT_PORT_VALUE;

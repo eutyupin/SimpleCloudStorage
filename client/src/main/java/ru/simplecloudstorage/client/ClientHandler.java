@@ -8,6 +8,9 @@ import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
@@ -18,6 +21,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private final String REGISTER_TITLE = "Регистрация прошла успешно!";
     private final String REGISTER_TEXT = "Попробуйте авторизоваться используя форму авторизации";
 
+    private String downloadingClientPath;
+    private String downloadingFileName;
     private ClientApp application;
 
     @Override
@@ -28,6 +33,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void checkCommands(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
         checkAuthOkCommand(command, channelHandlerContext);
         checkRegisterOkCommand(command, channelHandlerContext);
+        checkDownloadFileCommand(command, channelHandlerContext);
     }
 
     private void checkRegisterOkCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
@@ -58,8 +64,39 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
         }
     }
 
+    private void checkDownloadFileCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
+        if (command.getType().equals(CommandType.DOWNLOAD_FILE)) {
+            DownloadFileCommand downloadFileCommand = new DownloadFileCommand();
+            try(RandomAccessFile downloadedFile = new RandomAccessFile(downloadingClientPath + downloadingFileName, "rw")) {
+                downloadedFile.seek(downloadFileCommand.getStartPosition());
+                downloadedFile.write(downloadFileCommand.getContent());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (downloadFileCommand.isEndOfFile()) channelHandlerContext.close();
+        }
+    }
+
 
     public void setApplication(ClientApp application) {
         this.application = application;
+    }
+
+    public String getDownloadingClientPath() {
+        return downloadingClientPath;
+    }
+
+    public String getDownloadingFileName() {
+        return downloadingFileName;
+    }
+
+    public void setDownloadingClientPath(String downloadingClientPath) {
+        this.downloadingClientPath = downloadingClientPath;
+    }
+
+    public void setDownloadingFileName(String downloadingFileName) {
+        this.downloadingFileName = downloadingFileName;
     }
 }

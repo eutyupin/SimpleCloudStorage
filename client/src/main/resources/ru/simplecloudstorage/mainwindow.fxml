@@ -32,7 +32,7 @@
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" text="&lt;&lt;&lt;">
+                  <Button fx:id="uploadButton" mnemonicParsing="false" onAction="#uploadAction" text="&lt;&lt;&lt;">
                      <VBox.margin>
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>

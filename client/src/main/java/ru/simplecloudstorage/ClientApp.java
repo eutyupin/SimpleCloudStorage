@@ -8,24 +8,25 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import ru.simplecloudstorage.client.ClientConnector;
+import ru.simplecloudstorage.client.ClientDownloader;
 import ru.simplecloudstorage.controllers.AuthDialog;
+import ru.simplecloudstorage.controllers.MainWindow;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.SceneName;
-
 import java.io.IOException;
 
 public class ClientApp extends Application {
 
     private static Scene scene;
     private static Stage primaryStage;
+    private static FXMLLoader primaryLoader;
     private static Scene authScene;
     private static Stage authStage;
     private static String currentScene;
     private static String fromScene;
     private ClientConnector connector;
-
+    private MainWindow primaryController;
     private AuthDialog authController;
 
     public static void main(String[] args) {
@@ -40,6 +41,8 @@ public class ClientApp extends Application {
         primaryStage.setTitle("Simple Cloud Storage");
         primaryStage.setResizable(true);
         primaryStage.show();
+        primaryController = primaryLoader.getController();
+        primaryController.setApplication(this);
         connector = new ClientConnector();
         connector.setApplication(this);
         authDialogShow();
@@ -106,15 +109,15 @@ public class ClientApp extends Application {
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(ClientApp.class.getResource(fxml));
-        return fxmlLoader.load();
+        primaryLoader = new FXMLLoader(ClientApp.class.getResource(fxml));
+        return primaryLoader.load();
     }
 
     private void closeRequestCheck() {
         primaryStage.setOnCloseRequest( event -> {
             connector.connectorShutdown();
         });
-//        authStage.setOnHiding(windowEvent -> {
+//        authStage.setOnHiding(event -> {
 //            Platform.runLater(()-> {
 //                primaryStage.close();
 //            });
@@ -131,5 +134,9 @@ public class ClientApp extends Application {
 
     public AuthDialog getAuthDialog() {
         return authController;
+    }
+
+    public void mainWindowSetDownloader(ClientDownloader clientDownloader) {
+        primaryController.setDownloader(clientDownloader);
     }
 }

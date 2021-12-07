@@ -14,9 +14,6 @@ import ru.simplecloudstorage.network.CustomFileEncoder;
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.utils.ErrorDialog;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
 public class ClientConnector {
     private static int port;
     private static String host;
@@ -42,7 +39,7 @@ public class ClientConnector {
                         @Override
                         protected void initChannel(NioSocketChannel nioSocketChannel) {
                             nioSocketChannel.pipeline().addLast(
-                                    new LengthFieldBasedFrameDecoder(1024*1024, 0,
+                                    new LengthFieldBasedFrameDecoder(1024*128, 0,
                                             2,0,2),
                                     new LengthFieldPrepender(2),
                                     new CustomFileEncoder(),
@@ -53,6 +50,8 @@ public class ClientConnector {
                     })
                     .option(ChannelOption.SO_KEEPALIVE, true);
             clientChannel = client.connect(host, port).sync().channel();
+            ClientDownloader clientDownloader = new ClientDownloader(clientChannel);
+            application.mainWindowSetDownloader(clientDownloader);
             clientChannel.closeFuture().sync();
         } catch (Exception e) {
                 new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage());
@@ -63,24 +62,6 @@ public class ClientConnector {
 
     public void connectorShutdown() {
         workGroup.shutdownGracefully();
-    }
-
-    private void fileUploadToServer(String path) throws IOException {
-
-        try(RandomAccessFile requestedFile = new RandomAccessFile("", "r")) {
-            final UploadFileCommand uploadFileCommand = new UploadFileCommand();
-            byte[] content = new byte[(int) requestedFile.length()];
-            requestedFile.read(content);
-            uploadFileCommand.setContent(content);
-            clientChannel.writeAndFlush(uploadFileCommand);
-            System.out.println("File " + content.length + " bytes was transferred to server");
-        }
-    }
-
-    private void fileDownloadFromServer(String path) {
-        DownloadRequestCommand downloadRequestCommand = new DownloadRequestCommand();
-        downloadRequestCommand.setPath(path);
-        clientChannel.writeAndFlush(downloadRequestCommand);
     }
 
     public void userAuthorize(String login, int passwordHash) {

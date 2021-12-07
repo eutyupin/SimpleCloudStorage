@@ -1,13 +1,17 @@
 package ru.simplecloudstorage.services;
 
 import ru.simplecloudstorage.commands.*;
+import ru.simplecloudstorage.util.ClientCheckOrCreate;
 import ru.simplecloudstorage.util.DBCheckOrCreate;
+
+import java.nio.file.Paths;
 import java.sql.*;
 
 public class AuthorizeService {
 
     private  Statement statement;
     private ResultSet resultSet;
+    private String programRootPath = Paths.get("./").toUri().normalize().toString().substring(6);
 
     public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
         DBCheckOrCreate.tryCheckOrCreate(dbURL);
@@ -42,6 +46,7 @@ public class AuthorizeService {
         }
         if (correctLogin && correctPassword) {
             System.out.println("User: " + login + " logging OK.");
+            ClientCheckOrCreate.tryCheckClient(login, programRootPath);
             return authOkCommand;
         }
         else return authFailedCommand;
