@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
@@ -62,5 +63,9 @@ public class MainWindow {
 
     public void setDownloader(ClientDownloader clientDownloader) {
         this.clientDownloader = clientDownloader;
+    }
+
+    public static void updatePCView(TreeItem<String> item) {
+
     }
 }
