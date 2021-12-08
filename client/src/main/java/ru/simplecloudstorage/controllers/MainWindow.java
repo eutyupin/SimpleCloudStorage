@@ -17,8 +17,8 @@ import ru.simplecloudstorage.client.ClientDownloader;
 import ru.simplecloudstorage.utils.SceneName;
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainWindow implements Initializable {
@@ -28,7 +28,7 @@ public class MainWindow implements Initializable {
     @FXML
     public Button uploadButton;
     @FXML
-    public ComboBox diskBox;
+    private ComboBox diskBox;
     @FXML
     private BorderPane mainPane;
     @FXML
@@ -41,11 +41,13 @@ public class MainWindow implements Initializable {
     private HBox rightPane;
     private ClientApp application;
     private ClientDownloader clientDownloader;
+    private  List<String> excludeList;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
        diskBoxInit();
        rightViewInit();
+       excludeFoldersAdd();
     }
 
     public void rightViewInit() {
@@ -102,25 +104,32 @@ public class MainWindow implements Initializable {
     }
 
     private void createRightViewTree(String disk) {
-        Path rootDisk = Paths.get(disk + "\\").toAbsolutePath().normalize();
-        TreeItem<String> rootUserItem = new TreeItem<>(rootDisk.getFileName().toString());
+        File rootDisk = new File(disk + "/");
+        TreeItem<String> rootUserItem = new TreeItem<>(rootDisk.getPath().toString());
         rightView.setShowRoot(false);
-        fillFilesTree(rootDisk.toFile(), rootUserItem);
+        fillFilesTree(rootDisk, rootUserItem);
         rightView.setRoot(rootUserItem);
     }
 
     private void fillFilesTree(File target, TreeItem<String> item) {
-        Image folder = new Image("folder.png");
-        Image file = new Image("file.png");
-        ImageView folderIcon = new ImageView(folder); //new ImageView(new Image(getClass().getResourceAsStream("folder.png")));
-        ImageView fileIcon = new ImageView(file); //new ImageView(new Image(getClass().getResourceAsStream("file.png")));
+        ImageView folderIcon = new ImageView(new Image("folder.png"));
+        ImageView fileIcon = new ImageView(new Image("file.png"));
 
         if (target.isDirectory() && target.canRead()) {
             TreeItem<String> treeItem = new TreeItem<>(target.getName());
             treeItem.setGraphic(folderIcon);
             item.getChildren().add(treeItem);
             for (File element : target.listFiles()) {
-                fillFilesTree(element,treeItem);
+                String tempName = element.getPath().toString().substring(3);
+                boolean canAdd = false;
+                for (String s : excludeList) {
+                    if(tempName.equals(s)) {
+                        canAdd = false;
+                        break;
+                    } else canAdd = true;
+                }
+                if(canAdd) fillFilesTree(element,treeItem);
+                else continue;
             }
         } else {
             TreeItem<String> treeItem = new TreeItem<>(target.getName());
@@ -129,4 +138,17 @@ public class MainWindow implements Initializable {
         }
     }
 
+    private void excludeFoldersAdd() {
+        excludeList = new ArrayList<>();
+        excludeList.add("$Recycle.Bin");
+        excludeList.add("$WinREAgent");
+        excludeList.add("Documents and Settings");
+        excludeList.add("Program Files");
+        excludeList.add("Program Files (x86)");
+        excludeList.add("ProgramData");
+        excludeList.add("MSOCache");
+        excludeList.add("System Volume Information");
+        excludeList.add("Users");
+        excludeList.add("Windows");
+    }
 }
