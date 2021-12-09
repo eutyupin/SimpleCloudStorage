@@ -1,8 +1,6 @@
 package ru.simplecloudstorage.controllers;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,8 +17,6 @@ import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.client.ClientDownloader;
 import ru.simplecloudstorage.utils.SceneName;
 
-
-
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,10 +25,17 @@ import java.util.ResourceBundle;
 
 public class MainWindow implements Initializable {
 
+    private String serverPath, clientPath;
     @FXML
     public MenuItem settingsMenu;
     @FXML
     public Button uploadButton;
+    @FXML
+    public Button deleteButton;
+    @FXML
+    public Button newFolderButton;
+    @FXML
+    public Button downloadButton;
     @FXML
     private ComboBox diskBox;
     @FXML
@@ -53,6 +56,10 @@ public class MainWindow implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         diskBoxInit();
         excludeFoldersAdd();
+        deleteButton.graphicProperty().setValue(new ImageView(new Image("delete.png")));
+        newFolderButton.graphicProperty().setValue(new ImageView(new Image("add.png")));
+        uploadButton.graphicProperty().setValue(new ImageView(new Image("p-c.png")));
+        downloadButton.graphicProperty().setValue(new ImageView(new Image("c-p.png")));
     }
 
     public void rightViewInit() {
@@ -168,5 +175,13 @@ public class MainWindow implements Initializable {
 
     public void diskBoxUpdate(MouseEvent mouseEvent) {
         diskBox.setItems(diskListCreate());
+    }
+
+    @FXML
+    public void rightViewClicked(MouseEvent mouseEvent) {
+    }
+
+    @FXML
+    public void leftViewClicked(MouseEvent mouseEvent) {
     }
 }
