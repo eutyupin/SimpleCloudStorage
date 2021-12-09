@@ -10,7 +10,7 @@
         <menus>
             <Menu mnemonicParsing="false">
                <graphic>
-                  <ComboBox fx:id="diskBox" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="90.0" />
+                  <ComboBox fx:id="diskBox" nodeOrientation="LEFT_TO_RIGHT" onAction="#diskBoxAction" onMouseEntered="#diskBoxUpdate" prefHeight="25.0" prefWidth="90.0" />
                </graphic>
             </Menu>
           <Menu mnemonicParsing="false" text="Опции">

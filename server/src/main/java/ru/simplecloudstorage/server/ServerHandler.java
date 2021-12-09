@@ -6,18 +6,28 @@ import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.services.AuthorizeService;
 import ru.simplecloudstorage.services.RegisterService;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
-    private final String DB_URL = "jdbc:sqlite:" + Paths.get("./").toUri().normalize().toString().substring(6) + "base.db";
+    private final String APP_ROOT_PATH = Paths.get("./").toUri().normalize().toString().substring(6);
+    private final String DB_URL = "jdbc:sqlite:" + APP_ROOT_PATH + "base.db";
     private static final int BUFFER_SIZE = 64 * 1024;
     private final Executor executor;
+    private List<String> clientPathsList = new ArrayList<>();
+    private Path clientPath;
 
     public ServerHandler(Executor executor) {
         this.executor = executor;
@@ -55,7 +65,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                         authCommand.getPasswordHash(), DB_URL);
                 channelHandlerContext.writeAndFlush(returnedCommand);
                 if (returnedCommand.getType().equals(CommandType.AUTH_OK)) {
-                   channelHandlerContext.writeAndFlush(updateServerFileList());
+                    channelHandlerContext.writeAndFlush(updateServerFileList(authCommand.getLogin()));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -63,10 +73,37 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
         }
     }
 
-    private BaseCommand updateServerFileList() {
+    private BaseCommand updateServerFileList(String login) {
         ServerFileListCommand serverFileListCommand = new ServerFileListCommand();
-
+        clientPath = Paths.get(APP_ROOT_PATH + login);
+        createClientPathsList(clientPath, login);
+        serverFileListCommand.setFileList(clientPathsList);
+        serverFileListCommand.setRootDirectory(login);
         return serverFileListCommand;
+    }
+
+    private void createClientPathsList(Path path, String login) {
+        if (path.toFile().isDirectory()) {
+            try {
+                List<Path> paths = Files.list(path)
+                        .sorted(Comparator.comparing((Path p) -> !p.toFile().isDirectory()).thenComparing(Path::getFileName))
+                        .collect(Collectors.toList());
+                String source = "";
+                int index = 0;
+                String dir = "";
+                for (int i = 0; i < paths.size(); i++) {
+                    source = paths.get(i).toString();
+                    index = source.indexOf(login) + login.length() + 1;
+                    dir = source.substring(index, source.length());
+                    if(Files.isDirectory(paths.get(i))) dir = "D:" + dir;
+                    else dir = "F:" + dir;
+                    clientPathsList.add(dir);
+                    createClientPathsList(paths.get(i), login);
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     private void checkRegisterCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
@@ -136,8 +173,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        System.out.println("Exception: " + cause.getMessage());
-        ctx.close();
+    public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable cause) {
+//        System.out.println("Exception: " + cause.getMessage());
+        cause.printStackTrace();
+        channelHandlerContext.close();
     }
 }

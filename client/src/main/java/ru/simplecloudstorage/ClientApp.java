@@ -15,6 +15,8 @@ import ru.simplecloudstorage.controllers.MainWindow;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.SceneName;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientApp extends Application {
 
@@ -26,8 +28,9 @@ public class ClientApp extends Application {
     private static String currentScene;
     private static String fromScene;
     private ClientConnector connector;
-    private MainWindow primaryController;
+    private MainWindow mainWindow;
     private AuthDialog authController;
+    private ExecutorService mainWorkPool;
 
     public static void main(String[] args) {
         launch();
@@ -35,14 +38,15 @@ public class ClientApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        mainWorkPool = Executors.newCachedThreadPool();
         primaryStage = stage;
         scene = new Scene(loadFXML(SceneName.MAIN_WINDOW.getValue()));
         primaryStage.setScene(scene);
         primaryStage.setTitle("Simple Cloud Storage");
         primaryStage.setResizable(true);
         primaryStage.show();
-        primaryController = primaryLoader.getController();
-        primaryController.setApplication(this);
+        mainWindow = primaryLoader.getController();
+        mainWindow.setApplication(this);
         connector = new ClientConnector();
         connector.setApplication(this);
         authDialogShow();
@@ -71,13 +75,14 @@ public class ClientApp extends Application {
     public void authDialogClose() {
         Platform.runLater(() -> {
             authStage.close();
+            mainWindow.rightViewInit();
         });
     }
 
     private void connecting() {
-        new Thread(() -> {
+        mainWorkPool.execute(() -> {
             connector.run();
-        }).start();
+        });
     }
 
     public static void authDialogSetRoot(String fxml, String from) {
@@ -116,6 +121,7 @@ public class ClientApp extends Application {
     private void closeRequestCheck() {
         primaryStage.setOnCloseRequest( event -> {
             connector.connectorShutdown();
+            mainWorkPool.shutdownNow();
         });
 //        authStage.setOnHiding(event -> {
 //            Platform.runLater(()-> {
@@ -137,10 +143,10 @@ public class ClientApp extends Application {
     }
 
     public void mainWindowSetDownloader(ClientDownloader clientDownloader) {
-        primaryController.setDownloader(clientDownloader);
+        mainWindow.setDownloader(clientDownloader);
     }
 
     public MainWindow getMainWindow() {
-        return primaryController;
+        return mainWindow;
     }
 }

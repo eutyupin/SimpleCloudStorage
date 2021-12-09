@@ -8,6 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import javafx.application.Platform;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.network.CustomFileDecoder;
 import ru.simplecloudstorage.network.CustomFileEncoder;
@@ -54,7 +55,7 @@ public class ClientConnector {
             application.mainWindowSetDownloader(clientDownloader);
             clientChannel.closeFuture().sync();
         } catch (Exception e) {
-                new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage());
+            Platform.runLater(() -> new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage()));
         } finally {
             connectorShutdown();
         }
@@ -62,6 +63,7 @@ public class ClientConnector {
 
     public void connectorShutdown() {
         workGroup.shutdownGracefully();
+        clientChannel.close();
     }
 
     public void userAuthorize(String login, int passwordHash) {

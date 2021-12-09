@@ -6,15 +6,33 @@ import ru.simplecloudstorage.util.DBCheckOrCreate;
 
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AuthorizeService {
 
     private  Statement statement;
     private ResultSet resultSet;
     private String programRootPath = Paths.get("./").toUri().normalize().toString().substring(6);
+    private ExecutorService dbWorkThreadPool = Executors.newFixedThreadPool(1);
 
     public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
-        DBCheckOrCreate.tryCheckOrCreate(dbURL);
+        dbCheckOrCreate(dbURL);
+        return authCheck(login, passwordHash, dbURL);
+    }
+
+    private void dbCheckOrCreate(String dbURL) {
+        dbWorkThreadPool.execute(() -> {
+            try {
+                DBCheckOrCreate.tryCheckOrCreate(dbURL);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
+        dbWorkThreadPool.shutdownNow();
+    }
+
+    private BaseCommand authCheck(String login, int passwordHash, String dbURL) throws SQLException {
         AuthOkCommand authOkCommand = new AuthOkCommand();
         AuthFailedCommand authFailedCommand = new AuthFailedCommand();
         String errorMessage = "Неверный логин или пароль. Попробуйте еще раз или зарегистрируйтесь.";
