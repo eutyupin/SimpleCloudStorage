@@ -83,12 +83,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void getTreeItemFromList(List<String> pathsList, String login) {
         leftViewItems = new TreeItem<>(login);
         boolean isDir = false;
-            treeItemsAdd(pathsList);
+        treeItemsAdd(pathsList);
     }
 
     private void treeItemsAdd(List<String> pathsList) {
-        ImageView folderIcon = new ImageView(new Image("folder.png"));
-        ImageView fileIcon = new ImageView(new Image("file.png"));
         boolean isDir;
         for (String branch : pathsList) {
             if (branch.substring(0, 2).equals("D:")) isDir = true;
@@ -104,8 +102,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 }
                 if (found == null) {
                     found = new TreeItem<>(folders[i]);
-                    if(!isDir && i == folders.length - 1) found.setGraphic(fileIcon);
-                    else found.setGraphic(folderIcon);
+                    if(!isDir && i == folders.length - 1) found.setGraphic(new ImageView(new Image("file.png")));
+                    else found.setGraphic(new ImageView(new Image("folder.png")));
                     parent.getChildren().add(found);
                 }
                 parent = found;

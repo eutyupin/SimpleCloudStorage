@@ -115,15 +115,13 @@ public class MainWindow implements Initializable {
     }
 
     private void fillFilesTree(File target, TreeItem<String> item) {
-        ImageView folderIcon = new ImageView(new Image("folder.png"));
-        ImageView fileIcon = new ImageView(new Image("file.png"));
 
         if (target.isDirectory()) {
             String itemName;
             if (target.getName().length() == 0) itemName = diskBox.getValue().toString() + "\\";
             else itemName = target.getName();
             TreeItem<String> treeItem = new TreeItem<>(itemName);
-            treeItem.setGraphic(folderIcon);
+            treeItem.setGraphic(new ImageView(new Image("folder.png")));
             item.getChildren().add(treeItem);
 
             for (File element : target.listFiles()) {
@@ -140,7 +138,7 @@ public class MainWindow implements Initializable {
             }
         } else {
             TreeItem<String> treeItem = new TreeItem<>(target.getName());
-            treeItem.setGraphic(fileIcon);
+            treeItem.setGraphic(new ImageView(new Image("file.png")));
             item.getChildren().add(treeItem);
         }
     }
