@@ -12,6 +12,7 @@ import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -27,8 +28,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private final String REGISTER_TITLE = "Регистрация прошла успешно!";
     private final String REGISTER_TEXT = "Попробуйте авторизоваться используя форму авторизации";
 
-    private String downloadingClientPath;
-    private String downloadingFileName;
     private ClientApp application;
     private TreeItem<String> leftViewItems;
 
@@ -91,7 +90,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
         for (String branch : pathsList) {
             if (branch.substring(0, 2).equals("D:")) isDir = true;
             else isDir = false;
-            String[] folders = branch.substring(2).split(Pattern.quote("\\"));
+            String[] folders = branch.substring(2).split(Pattern.quote(File.separator));
             TreeItem<String> parent = leftViewItems;
             for (int i = 0; i < folders.length; i++) {
                     TreeItem<String> found = null;
@@ -114,8 +113,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
     private void checkDownloadFileCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
         if (command.getType().equals(CommandType.DOWNLOAD_FILE)) {
-            DownloadFileCommand downloadFileCommand = new DownloadFileCommand();
-            try(RandomAccessFile downloadedFile = new RandomAccessFile(downloadingClientPath + downloadingFileName, "rw")) {
+            DownloadFileCommand downloadFileCommand = (DownloadFileCommand) command;
+            System.out.println(downloadFileCommand.getDestinationPath());
+            try(RandomAccessFile downloadedFile = new RandomAccessFile(downloadFileCommand.getDestinationPath(), "rw")) {
                 downloadedFile.seek(downloadFileCommand.getStartPosition());
                 downloadedFile.write(downloadFileCommand.getContent());
             } catch (FileNotFoundException e) {
@@ -123,7 +123,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (downloadFileCommand.isEndOfFile()) channelHandlerContext.close();
+            if (downloadFileCommand.isEndOfFile()) {
+                application.getMainWindow().setRightView();
+            }
         }
     }
 
@@ -132,19 +134,4 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
         this.application = application;
     }
 
-    public String getDownloadingClientPath() {
-        return downloadingClientPath;
-    }
-
-    public String getDownloadingFileName() {
-        return downloadingFileName;
-    }
-
-    public void setDownloadingClientPath(String downloadingClientPath) {
-        this.downloadingClientPath = downloadingClientPath;
-    }
-
-    public void setDownloadingFileName(String downloadingFileName) {
-        this.downloadingFileName = downloadingFileName;
-    }
 }

@@ -181,6 +181,9 @@ public class MainWindow implements Initializable {
         leftView.setShowRoot(true);
         Platform.runLater(() -> leftView.setRoot(tree));
     }
+    public void setRightView() {
+        rightViewInit();
+    }
 
     public void diskBoxAction(ActionEvent actionEvent) {
         rightViewInit();
