@@ -1,5 +1,6 @@
 package ru.simplecloudstorage.controllers;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -69,9 +70,8 @@ public class AuthDialog {
     private void loginActions() {
         if (checkFieldsHaveText()) {
             connector.userAuthorize(loginField.getText(), passwordField.getText().hashCode());
-
         } else {
-            new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
+            Platform.runLater(() -> new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION));
         }
     }
 

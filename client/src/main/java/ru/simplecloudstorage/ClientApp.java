@@ -47,10 +47,14 @@ public class ClientApp extends Application {
         primaryStage.show();
         mainWindow = primaryLoader.getController();
         mainWindow.setApplication(this);
-        connector = new ClientConnector();
-        connector.setApplication(this);
+        newConnector();
         authDialogShow();
         closeRequestCheck();
+    }
+
+    public void newConnector() {
+        connector = new ClientConnector();
+        connector.setApplication(this);
     }
 
 

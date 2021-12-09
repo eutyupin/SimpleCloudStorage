@@ -20,13 +20,13 @@ public class ServerConnector {
     private static final int DEFAULT_PORT_VALUE = 9000;
 
     public void run() throws InterruptedException {
-        NioEventLoopGroup connectorGroup = new NioEventLoopGroup(1);
+        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
         NioEventLoopGroup workGroup = new NioEventLoopGroup();
         ExecutorService threadPool = Executors.newCachedThreadPool();
         ServerHandler serverHandler = new ServerHandler(threadPool);
         try {
             ServerBootstrap server = new ServerBootstrap()
-                    .group(connectorGroup, workGroup)
+                    .group(bossGroup, workGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
@@ -49,7 +49,7 @@ public class ServerConnector {
             channel.closeFuture().sync();
         } finally {
             {
-                connectorGroup.shutdownGracefully();
+                bossGroup.shutdownGracefully();
                 workGroup.shutdownGracefully();
                 threadPool.shutdownNow();
                 System.out.println("Simple Cloud Storage Server stopped!...");

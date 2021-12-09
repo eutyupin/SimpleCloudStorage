@@ -46,18 +46,18 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, BaseCommand command){
-        checkCommands(command, channelHandlerContext);
+    protected void channelRead0(ChannelHandlerContext ctx, BaseCommand command){
+        checkCommands(command, ctx);
     }
 
-    private void checkCommands(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
-            checkDownloadRequestCommand(command, channelHandlerContext);
-            checkUploadFileCommand(command, channelHandlerContext);
-            checkAuthCommand(command, channelHandlerContext);
-            checkRegisterCommand(command, channelHandlerContext);
+    private void checkCommands(BaseCommand command, ChannelHandlerContext ctx) {
+            checkDownloadRequestCommand(command, ctx);
+            checkUploadFileCommand(command, ctx);
+            checkAuthCommand(command, ctx);
+            checkRegisterCommand(command, ctx);
     }
 
-    private void checkAuthCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
+    private void checkAuthCommand(BaseCommand command, ChannelHandlerContext ctx) {
         if (command.getType().equals(CommandType.AUTH)) {
             AuthCommand authCommand = (AuthCommand) command;
             AuthorizeService authorizeService = new AuthorizeService();
@@ -65,10 +65,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             try {
                 BaseCommand returnedCommand = authorizeService.tryAuthorize(authCommand.getLogin(),
                         authCommand.getPasswordHash(), DB_URL);
-                channelHandlerContext.writeAndFlush(returnedCommand);
+                ctx.writeAndFlush(returnedCommand);
                 if (returnedCommand.getType().equals(CommandType.AUTH_OK)) {
                     login = authCommand.getLogin();
-                    channelHandlerContext.writeAndFlush(updateServerFileList(authCommand.getLogin()));
+                    ctx.writeAndFlush(updateServerFileList(authCommand.getLogin()));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -94,14 +94,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 String source = "";
                 int index = 0;
                 String dir = "";
-                for (int i = 0; i < paths.size(); i++) {
-                    source = paths.get(i).toString();
+                for (Path value : paths) {
+                    source = value.toString();
                     index = source.indexOf(login) + login.length() + 1;
                     dir = source.substring(index, source.length());
-                    if(Files.isDirectory(paths.get(i))) dir = "D:" + dir;
+                    if (Files.isDirectory(value)) dir = "D:" + dir;
                     else dir = "F:" + dir;
                     clientPathsList.add(dir);
-                    createClientPathsList(paths.get(i), login);
+                    createClientPathsList(value, login);
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -109,13 +109,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
         }
     }
 
-    private void checkRegisterCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
+    private void checkRegisterCommand(BaseCommand command, ChannelHandlerContext ctx) {
         if (command.getType().equals(CommandType.REGISTER)) {
             RegisterCommand registerCommand = (RegisterCommand) command;
             RegisterService registerService = new RegisterService();
             try {
                 System.out.println("User: " + registerCommand.getLogin() + " trying register");
-                channelHandlerContext.writeAndFlush(registerService.tryRegister(registerCommand.getLogin(), registerCommand.getPasswordHash(),
+                ctx.writeAndFlush(registerService.tryRegister(registerCommand.getLogin(), registerCommand.getPasswordHash(),
                         registerCommand.getEmail(), DB_URL));
 
             }catch (SQLException e) {
@@ -124,7 +124,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
         }
     }
 
-    private void checkUploadFileCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
+    private void checkUploadFileCommand(BaseCommand command, ChannelHandlerContext ctx) {
         if (command.getType().equals(CommandType.UPLOAD_FILE)) {
             UploadFileCommand uploadFileCommand = (UploadFileCommand) command;
             System.out.println("UploadFileCommand received" + System.lineSeparator() +
@@ -133,25 +133,23 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             try(RandomAccessFile uploadFile = new RandomAccessFile(path, "rw")) {
                 uploadFile.seek(uploadFileCommand.getStartPosition());
                 uploadFile.write(uploadFileCommand.getContent());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             if (uploadFileCommand.isEndOfFile()) {
-                channelHandlerContext.writeAndFlush(updateServerFileList(login));
+                ctx.writeAndFlush(updateServerFileList(login));
             }
         }
     }
 
-    private void checkDownloadRequestCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
+    private void checkDownloadRequestCommand(BaseCommand command, ChannelHandlerContext ctx) {
         if (command.getType().equals(CommandType.DOWNLOAD_REQUEST)) {
             DownloadRequestCommand downloadRequestCommand = (DownloadRequestCommand) command;
-            executor.execute(() -> fileDownloadProcess(downloadRequestCommand, (channelHandlerContext)));
+            executor.execute(() -> fileDownloadProcess(downloadRequestCommand, (ctx)));
         }
     }
 
-    private void fileDownloadProcess(DownloadRequestCommand downloadRequestCommand, ChannelHandlerContext channelHandlerContext) {
+    private void fileDownloadProcess(DownloadRequestCommand downloadRequestCommand, ChannelHandlerContext ctx) {
         String path = APP_ROOT_PATH + downloadRequestCommand.getPath();
         if(Files.isRegularFile(Path.of(path))) {
             try (RandomAccessFile requestedFile = new RandomAccessFile(path, "r")) {
@@ -177,7 +175,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                     downloadFileCommand.setStartPosition(position);
                     downloadFileCommand.setContent(bytes);
                     downloadFileCommand.setEndOfFile(endOfFile);
-                    channelHandlerContext.writeAndFlush(downloadFileCommand).sync();
+                    ctx.writeAndFlush(downloadFileCommand).sync();
                 } while (requestedFile.getFilePointer() < requestedFile.length());
 
             } catch (InterruptedException | IOException e) {
@@ -187,9 +185,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable cause) {
-//        System.out.println("Exception: " + cause.getMessage());
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        System.out.println("Exception: " + cause.getMessage());
         cause.printStackTrace();
-        channelHandlerContext.close();
+        ctx.close();
     }
 }

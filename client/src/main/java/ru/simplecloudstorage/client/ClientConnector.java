@@ -16,10 +16,11 @@ import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.utils.ErrorDialog;
 
 public class ClientConnector {
-    private static int port;
-    private static String host;
+
     private static final int DEFAULT_PORT_VALUE = 9000;
     private static final String DEFAULT_HOST_VALUE = "localhost";
+    private static int port;
+    private static String host;
 
     private static NioEventLoopGroup workGroup;
     private static Bootstrap client;
@@ -62,8 +63,8 @@ public class ClientConnector {
     }
 
     public void connectorShutdown() {
-        workGroup.shutdownGracefully();
         clientChannel.close();
+        workGroup.shutdownGracefully();
     }
 
     public void userAuthorize(String login, int passwordHash) {
