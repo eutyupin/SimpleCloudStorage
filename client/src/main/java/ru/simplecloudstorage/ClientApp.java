@@ -38,7 +38,7 @@ public class ClientApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        mainWorkPool = Executors.newCachedThreadPool();
+        mainWorkPool = Executors.newSingleThreadExecutor();
         primaryStage = stage;
         scene = new Scene(loadFXML(SceneName.MAIN_WINDOW.getValue()));
         primaryStage.setScene(scene);
@@ -68,7 +68,6 @@ public class ClientApp extends Application {
         authController = authLoader.getController();
         authController.setClientApp(this);
         authController.setConnector(connector);
-        authController.setAuthStage(authStage);
         connecting();
         authStage.show();
     }
@@ -148,5 +147,9 @@ public class ClientApp extends Application {
 
     public MainWindow getMainWindow() {
         return mainWindow;
+    }
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
 }

@@ -22,12 +22,14 @@ import java.util.stream.Collectors;
 
 public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
-    private final String APP_ROOT_PATH = Paths.get("./").toUri().normalize().toString().substring(6);
-    private final String DB_URL = "jdbc:sqlite:" + APP_ROOT_PATH + "base.db";
+    private final String APP_ROOT_PATH = Paths.get("./").toAbsolutePath().normalize().toString() + File.separator;
+    private final String APP_ROOT_URI = Paths.get("./").toUri().normalize().toString().substring(6);
+    private final String DB_URL = "jdbc:sqlite:" + APP_ROOT_URI + "base.db";
     private static final int BUFFER_SIZE = 64 * 1024;
     private final Executor executor;
     private List<String> clientPathsList = new ArrayList<>();
     private Path clientPath;
+    private String login;
 
     public ServerHandler(Executor executor) {
         this.executor = executor;
@@ -65,6 +67,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                         authCommand.getPasswordHash(), DB_URL);
                 channelHandlerContext.writeAndFlush(returnedCommand);
                 if (returnedCommand.getType().equals(CommandType.AUTH_OK)) {
+                    login = authCommand.getLogin();
                     channelHandlerContext.writeAndFlush(updateServerFileList(authCommand.getLogin()));
                 }
             } catch (SQLException e) {
@@ -124,7 +127,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void checkUploadFileCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
         if (command.getType().equals(CommandType.UPLOAD_FILE)) {
             UploadFileCommand uploadFileCommand = (UploadFileCommand) command;
-            try(RandomAccessFile uploadFile = new RandomAccessFile(uploadFileCommand.getFilePath(), "rw")) {
+            System.out.println("UploadFileCommand received" + System.lineSeparator() +
+                    "Path to download: " + APP_ROOT_PATH + uploadFileCommand.getFilePath());
+            String path = APP_ROOT_PATH + uploadFileCommand.getFilePath();
+            try(RandomAccessFile uploadFile = new RandomAccessFile(path, "rw")) {
                 uploadFile.seek(uploadFileCommand.getStartPosition());
                 uploadFile.write(uploadFileCommand.getContent());
             } catch (FileNotFoundException e) {
@@ -132,7 +138,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (uploadFileCommand.isEndOfFile()) channelHandlerContext.close();
+            if (uploadFileCommand.isEndOfFile()) {
+                channelHandlerContext.writeAndFlush(updateServerFileList(login));
+            }
         }
     }
 
@@ -144,7 +152,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     }
 
     private void fileDownloadProcess(DownloadRequestCommand downloadRequestCommand, ChannelHandlerContext channelHandlerContext) {
-        try (RandomAccessFile requestedFile = new RandomAccessFile(downloadRequestCommand.getPath(), "r")) {
+
+        try (RandomAccessFile requestedFile = new RandomAccessFile("", "r")) {
             long fileLength = requestedFile.length();
             do {
                 long position = requestedFile.getFilePointer();

@@ -40,9 +40,9 @@ public class ClientConnector {
                         @Override
                         protected void initChannel(NioSocketChannel nioSocketChannel) {
                             nioSocketChannel.pipeline().addLast(
-                                    new LengthFieldBasedFrameDecoder(1024*128, 0,
-                                            2,0,2),
-                                    new LengthFieldPrepender(2),
+                                    new LengthFieldBasedFrameDecoder(1024*1024, 0,
+                                            4,0,4),
+                                    new LengthFieldPrepender(4),
                                     new CustomFileEncoder(),
                                     new CustomFileDecoder(),
                                     clientHandler

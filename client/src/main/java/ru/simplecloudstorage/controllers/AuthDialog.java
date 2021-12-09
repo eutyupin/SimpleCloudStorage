@@ -3,13 +3,11 @@ package ru.simplecloudstorage.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.utils.ErrorDialog;
@@ -22,6 +20,10 @@ public class AuthDialog {
     private final String ERROR = "Ошибка";
     private final String ERROR_TITLE = "Не все поля заполнены";
     private final String ERROR_DESCRIPTION = "Заполните все поля и повторите попытку авторизации";
+
+
+    private ClientApp application;
+    private static ClientConnector connector;
     
     @FXML
     private Button okButton;
@@ -29,16 +31,13 @@ public class AuthDialog {
     private TextField loginField;
     @FXML
     private PasswordField passwordField;
-    private ClientApp clientApp;
-    private static ClientConnector connector;
-    private Stage authStage;
 
     public void setClientApp(ClientApp clientApp) {
-        this.clientApp = clientApp;
+        this.application = clientApp;
     }
 
     @FXML
-    private void regLinkClicked(MouseEvent mouseEvent) throws IOException {
+    private void regLinkClicked(MouseEvent mouseEvent) {
         ClientApp.authDialogSetRoot(SceneName.REGISTER_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
     }
 
@@ -57,12 +56,13 @@ public class AuthDialog {
     }
 
     @FXML
-    private void okButtonKeyPressed(KeyEvent keyEvent) throws IOException {
+    private void okButtonKeyPressed(KeyEvent keyEvent) {
         loginActions();
+        application.getMainWindow().setLogin(loginField.getText());
     }
 
     @FXML
-    private void okButtonClicked(MouseEvent mouseEvent) throws IOException {
+    private void okButtonClicked(MouseEvent mouseEvent) {
         loginActions();
     }
 
@@ -96,10 +96,6 @@ public class AuthDialog {
         loginField.clear();
         passwordField.clear();
         loginField.requestFocus();
-    }
-
-    public void setAuthStage(Stage authStage) {
-        this.authStage = authStage;
     }
 
     public void setConnector(ClientConnector clientConnector) {

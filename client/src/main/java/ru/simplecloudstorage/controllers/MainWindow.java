@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.client.ClientDownloader;
+import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
 import java.io.File;
@@ -25,7 +26,7 @@ import java.util.ResourceBundle;
 
 public class MainWindow implements Initializable {
 
-    private String serverPath, clientPath;
+    private String serverPath, clientPath, login;
     @FXML
     public MenuItem settingsMenu;
     @FXML
@@ -56,6 +57,10 @@ public class MainWindow implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         diskBoxInit();
         excludeFoldersAdd();
+        setImageToButtons();
+    }
+
+    private void setImageToButtons() {
         deleteButton.graphicProperty().setValue(new ImageView(new Image("delete.png")));
         newFolderButton.graphicProperty().setValue(new ImageView(new Image("add.png")));
         uploadButton.graphicProperty().setValue(new ImageView(new Image("p-c.png")));
@@ -80,7 +85,6 @@ public class MainWindow implements Initializable {
         return disksList;
     }
 
-
     @FXML
     private void paneZoom(ZoomEvent zoomEvent) {
         leftPane.setPrefWidth((mainPane.getWidth()/2) - 40);
@@ -92,29 +96,37 @@ public class MainWindow implements Initializable {
         ClientApp.setRoot(SceneName.SETTINGS_WINDOW.getValue(), SceneName.MAIN_WINDOW.getValue());
     }
 
-
-    @FXML
-    private void closeMenuItemAction(ActionEvent actionEvent) {
-    }
-
     @FXML
     private void uploadAction(ActionEvent actionEvent) {
+        if (!clientPath.isEmpty() && !serverPath.isEmpty()) {
+            File f = new File(clientPath);
+            if(f.isFile()) {
+                clientDownloader.fileUploadToServer(clientPath, serverPath +
+                        clientPath.substring(clientPath.lastIndexOf(File.separator),
+                                clientPath.length()));
+            }
+        } else {
+            Platform.runLater(() -> new InformationDialog("Не выполнено действие",
+                    "Не выбраны точки копирования",
+                    "Выберите место откуда и куда вы хотите произвести копирование " +
+                            "и попробуйте еще раз!"));
+        }
     }
 
     public void setApplication(ClientApp clientApp) {
         this.application = clientApp;
     }
 
-    public void setClientDownloader(ClientDownloader clientDownloader) {
-        this.clientDownloader = clientDownloader;
-    }
+//    public void setClientDownloader(ClientDownloader clientDownloader) {
+//        this.clientDownloader = clientDownloader;
+//    }
 
     public void setDownloader(ClientDownloader clientDownloader) {
         this.clientDownloader = clientDownloader;
     }
 
     private void createRightViewTree(String disk) {
-        File rootDisk = new File(disk + "\\");
+        File rootDisk = new File(disk + File.separator);
         TreeItem<String> rootPCItem = new TreeItem<>(rootDisk.getPath().toString());
         rightView.setShowRoot(false);
         fillFilesTree(rootDisk, rootPCItem);
@@ -125,7 +137,7 @@ public class MainWindow implements Initializable {
 
         if (target.isDirectory()) {
             String itemName;
-            if (target.getName().length() == 0) itemName = diskBox.getValue().toString() + "\\";
+            if (target.getName().length() == 0) itemName = diskBox.getValue().toString();
             else itemName = target.getName();
             TreeItem<String> treeItem = new TreeItem<>(itemName);
             treeItem.setGraphic(new ImageView(new Image("folder.png")));
@@ -179,9 +191,33 @@ public class MainWindow implements Initializable {
 
     @FXML
     public void rightViewClicked(MouseEvent mouseEvent) {
+        clientPath = getViewItemPath(rightView);
     }
 
     @FXML
     public void leftViewClicked(MouseEvent mouseEvent) {
+        serverPath = login + File.separator + getViewItemPath(leftView);
+    }
+
+    private String getViewItemPath(TreeView tree) {
+        String tempPathToFile = "";
+        String value = "";
+            MultipleSelectionModel<TreeItem<String>> items = tree.getSelectionModel();
+            TreeItem<String> treeItem = items.getSelectedItem();
+            while (treeItem != tree.getRoot()) {
+                value = treeItem.getValue();
+                tempPathToFile = value + File.separator + tempPathToFile;
+                treeItem = treeItem.getParent();
+            }
+        return tempPathToFile.substring(0, tempPathToFile.length()-1);
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    @FXML
+    public void downloadAction(ActionEvent actionEvent) {
+        clientDownloader.fileDownloadFromServer(serverPath, clientPath);
     }
 }

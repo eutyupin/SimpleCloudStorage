@@ -8,10 +8,10 @@ import ru.simplecloudstorage.utils.SceneName;
 public class SettingsWindow {
     @FXML
     public void okButtonAction(ActionEvent actionEvent) {
-
     }
 
     public void cancelButtonAction(ActionEvent actionEvent) {
         ClientApp.authDialogSetRoot(ClientApp.getFromScene(), SceneName.SETTINGS_WINDOW.getValue());
+        ClientApp.setRoot(SceneName.MAIN_WINDOW.getValue(), SceneName.SETTINGS_WINDOW.getValue());
     }
 }

@@ -18,11 +18,6 @@
               <MenuItem fx:id="settingsMenu" mnemonicParsing="false" onAction="#SettingsAction" text="Нстройки соединения" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Файл">
-            <items>
-              <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeMenuItemAction" text="Выход" />
-            </items>
-          </Menu>
         </menus>
       </MenuBar>
    </top>
@@ -38,7 +33,7 @@
                         <Button fx:id="newFolderButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="20.0" />
                     </items>
                   </ToolBar>
-                  <Button fx:id="downloadButton" mnemonicParsing="false">
+                  <Button fx:id="downloadButton" mnemonicParsing="false" onAction="#downloadAction">
                      <VBox.margin>
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>

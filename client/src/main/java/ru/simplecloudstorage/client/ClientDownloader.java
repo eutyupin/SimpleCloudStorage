@@ -19,13 +19,14 @@ public class ClientDownloader {
         threadPool = Executors.newCachedThreadPool();
     }
 
-    private void fileUploadToServer(String path, String destinationPath) throws IOException {
+    public void fileUploadToServer(String path, String destinationPath) {
         threadPool.execute(() -> fileUploadProcess(path, destinationPath));
     }
 
-    private void fileDownloadFromServer(String path) {
+    public void fileDownloadFromServer(String path, String destinationPath) {
         DownloadRequestCommand downloadRequestCommand = new DownloadRequestCommand();
         downloadRequestCommand.setPath(path);
+        downloadRequestCommand.setDestinationPath(destinationPath);
         clientChannel.writeAndFlush(downloadRequestCommand);
     }
 
