@@ -152,32 +152,37 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     }
 
     private void fileDownloadProcess(DownloadRequestCommand downloadRequestCommand, ChannelHandlerContext channelHandlerContext) {
+        String path = APP_ROOT_PATH + downloadRequestCommand.getPath();
+        if(Files.isRegularFile(Path.of(path))) {
+            try (RandomAccessFile requestedFile = new RandomAccessFile(path, "r")) {
+                long fileLength = requestedFile.length();
+                do {
+                    long position = requestedFile.getFilePointer();
+                    long availableBytes = fileLength - position;
+                    byte[] bytes;
+                    boolean endOfFile = false;
 
-        try (RandomAccessFile requestedFile = new RandomAccessFile("", "r")) {
-            long fileLength = requestedFile.length();
-            do {
-                long position = requestedFile.getFilePointer();
-                long availableBytes = fileLength - position;
-                byte[] bytes;
-                boolean endOfFile = false;
+                    if (availableBytes >= BUFFER_SIZE) {
+                        bytes = new byte[BUFFER_SIZE];
+                    } else {
+                        bytes = new byte[(int) availableBytes];
+                        endOfFile = true;
+                    }
+                    requestedFile.read(bytes);
+                    DownloadFileCommand downloadFileCommand = new DownloadFileCommand();
+                    downloadFileCommand.setDestinationPath(downloadRequestCommand.getDestinationPath() +
+                            downloadRequestCommand.getPath().substring(downloadRequestCommand.getPath().lastIndexOf(File.separator),
+                                    downloadRequestCommand.getPath().length()));
+                    downloadFileCommand.setTotalFileLength(fileLength);
+                    downloadFileCommand.setStartPosition(position);
+                    downloadFileCommand.setContent(bytes);
+                    downloadFileCommand.setEndOfFile(endOfFile);
+                    channelHandlerContext.writeAndFlush(downloadFileCommand).sync();
+                } while (requestedFile.getFilePointer() < requestedFile.length());
 
-                if (availableBytes >= BUFFER_SIZE) {
-                    bytes = new byte[BUFFER_SIZE];
-                } else {
-                    bytes = new byte[(int) availableBytes];
-                    endOfFile = true;
-                }
-                requestedFile.read(bytes);
-                DownloadFileCommand downloadFileCommand = new DownloadFileCommand();
-                downloadFileCommand.setTotalFileLength(fileLength);
-                downloadFileCommand.setStartPosition(position);
-                downloadFileCommand.setContent(bytes);
-                downloadFileCommand.setEndOfFile(endOfFile);
-                channelHandlerContext.writeAndFlush(downloadFileCommand).sync();
-            } while (requestedFile.getFilePointer() < requestedFile.length());
-
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

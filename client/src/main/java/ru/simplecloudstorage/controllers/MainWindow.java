@@ -20,6 +20,8 @@ import ru.simplecloudstorage.utils.SceneName;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -99,8 +101,7 @@ public class MainWindow implements Initializable {
     @FXML
     private void uploadAction(ActionEvent actionEvent) {
         if (!clientPath.isEmpty() && !serverPath.isEmpty()) {
-            File f = new File(clientPath);
-            if(f.isFile()) {
+            if(Files.isRegularFile(Path.of(clientPath))) {
                 clientDownloader.fileUploadToServer(clientPath, serverPath +
                         clientPath.substring(clientPath.lastIndexOf(File.separator),
                                 clientPath.length()));
