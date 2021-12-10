@@ -19,6 +19,7 @@ import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,7 +29,9 @@ import java.util.ResourceBundle;
 
 public class MainWindow implements Initializable {
 
-    private String serverPath, clientPath, login;
+    private String serverPath;
+    private String clientPath;
+    private String login;
     @FXML
     public MenuItem settingsMenu;
     @FXML
@@ -118,10 +121,6 @@ public class MainWindow implements Initializable {
         this.application = clientApp;
     }
 
-//    public void setClientDownloader(ClientDownloader clientDownloader) {
-//        this.clientDownloader = clientDownloader;
-//    }
-
     public void setDownloader(ClientDownloader clientDownloader) {
         this.clientDownloader = clientDownloader;
     }
@@ -130,11 +129,15 @@ public class MainWindow implements Initializable {
         File rootDisk = new File(disk + File.separator);
         TreeItem<String> rootPCItem = new TreeItem<>(rootDisk.getPath().toString());
         rightView.setShowRoot(false);
-        fillFilesTree(rootDisk, rootPCItem);
+        try {
+            fillFilesTree(rootDisk, rootPCItem);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         rightView.setRoot(rootPCItem);
     }
 
-    private void fillFilesTree(File target, TreeItem<String> item) {
+    private void fillFilesTree(File target, TreeItem<String> item) throws IOException {
 
         if (target.isDirectory()) {
             String itemName;
@@ -148,7 +151,8 @@ public class MainWindow implements Initializable {
                 String tempName = element.getPath().toString().substring(3);
                 boolean canAdd = false;
                 for (String s : excludeList) {
-                    if(tempName.equals(s)) {
+                    if(tempName.equals(s) || tempName.endsWith(".sys") ||
+                    tempName.endsWith(".tmp")) {
                         canAdd = false;
                         break;
                     } else canAdd = true;
@@ -178,7 +182,7 @@ public class MainWindow implements Initializable {
     }
 
     public void setLeftView(TreeItem<String> tree) {
-        leftView.setShowRoot(true);
+        leftView.setShowRoot(false);
         Platform.runLater(() -> leftView.setRoot(tree));
     }
     public void setRightView() {
@@ -200,7 +204,7 @@ public class MainWindow implements Initializable {
 
     @FXML
     public void leftViewClicked(MouseEvent mouseEvent) {
-        serverPath = login + File.separator + getViewItemPath(leftView);
+        serverPath = getViewItemPath(leftView);
     }
 
     private String getViewItemPath(TreeView tree) {

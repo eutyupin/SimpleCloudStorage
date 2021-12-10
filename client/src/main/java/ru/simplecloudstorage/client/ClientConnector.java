@@ -63,7 +63,6 @@ public class ClientConnector {
     }
 
     public void connectorShutdown() {
-        clientChannel.close();
         workGroup.shutdownGracefully();
     }
 

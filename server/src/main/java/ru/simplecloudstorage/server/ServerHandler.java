@@ -97,7 +97,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 for (Path value : paths) {
                     source = value.toString();
                     index = source.indexOf(login) + login.length() + 1;
-                    dir = source.substring(index, source.length());
+                    dir = login + File.separator + source.substring(index, source.length());
                     if (Files.isDirectory(value)) dir = "D:" + dir;
                     else dir = "F:" + dir;
                     clientPathsList.add(dir);

@@ -81,6 +81,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
     private void getTreeItemFromList(List<String> pathsList, String login) {
         leftViewItems = new TreeItem<>(login);
+        leftViewItems.setGraphic(new ImageView(new Image("folder.png")));
         boolean isDir = false;
         treeItemsAdd(pathsList);
     }
