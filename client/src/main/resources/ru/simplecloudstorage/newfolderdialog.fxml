@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="121.0" prefWidth="301.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.simplecloudstorage.controllers.NewFolderDialog">
+   <children>
+      <TextField fx:id="directoryNameField" layoutX="8.0" layoutY="22.0" onKeyPressed="#textFieldKeyPresset" prefHeight="25.0" prefWidth="286.0" />
+      <Label layoutX="8.0" layoutY="5.0" text="Имя папки:" />
+      <Button fx:id="okButton" layoutX="28.0" layoutY="70.0" mnemonicParsing="false" onAction="#okButtonAction" prefHeight="25.0" prefWidth="84.0" text="ОК" />
+      <Button fx:id="cancelButton" layoutX="185.0" layoutY="70.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="25.0" prefWidth="84.0" text="Отмена" />
+   </children>
+</Pane>

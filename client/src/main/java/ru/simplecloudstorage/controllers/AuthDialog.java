@@ -38,11 +38,6 @@ public class AuthDialog {
     }
 
     @FXML
-    private void regLinkClicked(MouseEvent mouseEvent) {
-        ClientApp.authDialogSetRoot(SceneName.REGISTER_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
-    }
-
-    @FXML
     private void loginFieldKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER){
             passwordField.requestFocus();
@@ -87,11 +82,6 @@ public class AuthDialog {
         return true;
     }
 
-    @FXML
-    private void settingsButtonAction(ActionEvent actionEvent) {
-        ClientApp.authDialogSetRoot(SceneName.SETTINGS_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
-    }
-
     public void prepareFieldsForLogin() {
         loginField.clear();
         passwordField.clear();
@@ -101,5 +91,9 @@ public class AuthDialog {
     public void setConnector(ClientConnector clientConnector) {
         connector = clientConnector;
         RegisterDialog.setConnector(clientConnector);
+    }
+
+    public void registerButtonAction(ActionEvent actionEvent) {
+        ClientApp.authDialogSetRoot(SceneName.REGISTER_WINDOW.getValue(), SceneName.AUTH_DIALOG.getValue());
     }
 }

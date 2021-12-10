@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 
 public class ServerConnector {
     private static int port;
-    private static final int DEFAULT_PORT_VALUE = 9000;
+    private static final int DEFAULT_PORT_VALUE = 8189;
 
     public void run() throws InterruptedException {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);

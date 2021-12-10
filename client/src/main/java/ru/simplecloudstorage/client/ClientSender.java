@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.commands.DeleteCommand;
 import ru.simplecloudstorage.commands.DownloadRequestCommand;
+import ru.simplecloudstorage.commands.NewDirectoryCommand;
 import ru.simplecloudstorage.commands.UploadFileCommand;
 import ru.simplecloudstorage.controllers.MainWindow;
 
@@ -12,15 +13,21 @@ import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ClientDownloader {
+public class ClientSender {
     private final Channel clientChannel;
     private final ExecutorService threadPool;
     private static final int BUFFER_SIZE = 64 * 1024;
     private MainWindow mainWindow;
 
-    public ClientDownloader(Channel clientChannel) {
+    public ClientSender(Channel clientChannel) {
         this.clientChannel = clientChannel;
         threadPool = Executors.newCachedThreadPool();
+    }
+
+    public void newDirectoryCreateOnServer(String path) {
+        NewDirectoryCommand newDirectoryCommand = new NewDirectoryCommand();
+        newDirectoryCommand.setPath(path);
+        clientChannel.writeAndFlush(newDirectoryCommand);
     }
 
     public void fileUploadToServer(String path, String destinationPath) {

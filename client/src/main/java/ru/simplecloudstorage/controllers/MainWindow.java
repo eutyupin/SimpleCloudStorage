@@ -14,7 +14,7 @@ import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import ru.simplecloudstorage.ClientApp;
-import ru.simplecloudstorage.client.ClientDownloader;
+import ru.simplecloudstorage.client.ClientSender;
 import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
@@ -60,7 +60,7 @@ public class MainWindow implements Initializable {
     @FXML
     private HBox rightPane;
     private ClientApp application;
-    private ClientDownloader clientDownloader;
+    private ClientSender clientSender;
     private  List<String> excludeList;
 
     @Override
@@ -102,15 +102,10 @@ public class MainWindow implements Initializable {
     }
 
     @FXML
-    private void SettingsAction(ActionEvent actionEvent) {
-        ClientApp.setRoot(SceneName.SETTINGS_WINDOW.getValue(), SceneName.MAIN_WINDOW.getValue());
-    }
-
-    @FXML
     private void uploadAction(ActionEvent actionEvent) {
         if (!clientPath.isEmpty() && !serverPath.isEmpty()) {
             if(Files.isRegularFile(Path.of(clientPath))) {
-                clientDownloader.fileUploadToServer(clientPath, serverPath +
+                clientSender.fileUploadToServer(clientPath, serverPath +
                         clientPath.substring(clientPath.lastIndexOf(File.separator),
                                 clientPath.length()));
             }
@@ -126,9 +121,9 @@ public class MainWindow implements Initializable {
         this.application = clientApp;
     }
 
-    public void setDownloader(ClientDownloader clientDownloader) {
-        this.clientDownloader = clientDownloader;
-        clientDownloader.setMainWindow(this);
+    public void setDownloader(ClientSender clientSender) {
+        this.clientSender = clientSender;
+        clientSender.setMainWindow(this);
     }
 
     private void createRightViewTree(String disk) {
@@ -232,7 +227,7 @@ public class MainWindow implements Initializable {
 
     @FXML
     public void downloadAction(ActionEvent actionEvent) {
-        clientDownloader.fileDownloadFromServer(serverPath, clientPath);
+        clientSender.fileDownloadFromServer(serverPath, clientPath);
     }
 
     @FXML
@@ -244,8 +239,18 @@ public class MainWindow implements Initializable {
           confirmationDialog.setContentText(serverPath);
             Optional<ButtonType> option = confirmationDialog.showAndWait();
             if (option.get() == ButtonType.OK) {
-                clientDownloader.deleteOnServerProcess(serverPath);
+                clientSender.deleteOnServerProcess(serverPath);
             }
         }
     }
+
+    public void sendNewFolderCommand(String folderName) {
+        clientSender.newDirectoryCreateOnServer(serverPath + File.separator + folderName);
+    }
+
+    public void createNewFolder(ActionEvent actionEvent) {
+        application.getNewFolderDialogStage().showAndWait();
+    }
+
+
 }

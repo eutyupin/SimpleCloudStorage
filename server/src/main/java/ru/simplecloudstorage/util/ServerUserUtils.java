@@ -43,4 +43,15 @@ public  class ServerUserUtils {
         System.out.println("Deleted file: " + path.toString());
         return true;
     }
+
+    public static boolean createNewDirectory(Path path) {
+        try {
+            Files.createDirectory(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        System.out.println("Directory created: " + path.toString());
+        return true;
+    }
 }

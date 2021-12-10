@@ -17,19 +17,14 @@ import ru.simplecloudstorage.utils.ErrorDialog;
 
 public class ClientConnector {
 
-    private static final int DEFAULT_PORT_VALUE = 9000;
-    private static final String DEFAULT_HOST_VALUE = "localhost";
-    private static int port;
-    private static String host;
-
     private static NioEventLoopGroup workGroup;
     private static Bootstrap client;
     private static Channel clientChannel;
     private static ClientHandler clientHandler;
+    private ClientSender clientSender;
     private ClientApp application;
 
     public void run() {
-        setConnectParameters();
         try {
             workGroup = new NioEventLoopGroup(1);
             clientHandler = new ClientHandler();
@@ -52,9 +47,9 @@ public class ClientConnector {
                         }
                     })
                     .option(ChannelOption.SO_KEEPALIVE, true);
-            clientChannel = client.connect(host, port).sync().channel();
-            ClientDownloader clientDownloader = new ClientDownloader(clientChannel);
-            application.mainWindowSetDownloader(clientDownloader);
+            clientChannel = client.connect(ClientApp.consoleHost, ClientApp.consolePort).sync().channel();
+            clientSender = new ClientSender(clientChannel);
+            application.mainWindowSetDownloader(clientSender);
             clientChannel.closeFuture().sync();
         } catch (Exception e) {
             Platform.runLater(() -> new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage()));
@@ -64,6 +59,7 @@ public class ClientConnector {
     }
 
     public void connectorShutdown() {
+        clientSender.getThreadPool().shutdownNow();
         clientChannel.close();
         workGroup.shutdownGracefully();
     }
@@ -81,11 +77,6 @@ public class ClientConnector {
         registerCommand.setPasswordHash(passwordHash);
         registerCommand.setEmail(email);
         clientChannel.writeAndFlush(registerCommand);
-    }
-
-    public static void setConnectParameters() {
-            host = DEFAULT_HOST_VALUE;
-            port = DEFAULT_PORT_VALUE;
     }
 
     public void setApplication(ClientApp application) {

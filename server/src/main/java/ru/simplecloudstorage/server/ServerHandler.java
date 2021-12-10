@@ -57,6 +57,17 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             checkAuthCommand(command, ctx);
             checkRegisterCommand(command, ctx);
             checkDeleteCommand(command, ctx);
+            chekNewDirectoryCommand(command, ctx);
+    }
+
+    private void chekNewDirectoryCommand(BaseCommand command, ChannelHandlerContext ctx) {
+        if (command.getType().equals(CommandType.NEW_DIRECTORY)) {
+            NewDirectoryCommand newDirectoryCommand = (NewDirectoryCommand) command;
+            Path newDirectory = Paths.get(APP_ROOT_PATH, newDirectoryCommand.getPath());
+            if (ServerUserUtils.createNewDirectory(newDirectory)) {
+                ctx.writeAndFlush(updateServerFileList(login));
+            }
+        }
     }
 
     private void checkDeleteCommand(BaseCommand command, ChannelHandlerContext ctx) {
