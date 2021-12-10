@@ -34,6 +34,7 @@ public class ClientConnector {
             workGroup = new NioEventLoopGroup(1);
             clientHandler = new ClientHandler();
             clientHandler.setApplication(application);
+            clientHandler.setMainWindow(application.getMainWindow());
             client = new Bootstrap()
                     .group(workGroup)
                     .channel(NioSocketChannel.class)
@@ -63,6 +64,7 @@ public class ClientConnector {
     }
 
     public void connectorShutdown() {
+        clientChannel.close();
         workGroup.shutdownGracefully();
     }
 

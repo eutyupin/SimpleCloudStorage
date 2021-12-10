@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainWindow implements Initializable {
@@ -32,6 +33,10 @@ public class MainWindow implements Initializable {
     private String serverPath;
     private String clientPath;
     private String login;
+    private double pr = 0;
+
+    @FXML
+    public ProgressBar progressBar;
     @FXML
     public MenuItem settingsMenu;
     @FXML
@@ -123,6 +128,7 @@ public class MainWindow implements Initializable {
 
     public void setDownloader(ClientDownloader clientDownloader) {
         this.clientDownloader = clientDownloader;
+        clientDownloader.setMainWindow(this);
     }
 
     private void createRightViewTree(String disk) {
@@ -227,5 +233,19 @@ public class MainWindow implements Initializable {
     @FXML
     public void downloadAction(ActionEvent actionEvent) {
         clientDownloader.fileDownloadFromServer(serverPath, clientPath);
+    }
+
+    @FXML
+    public void deleteAction(ActionEvent actionEvent) {
+        if (serverPath.length() > (login.length() + File.separator.length())) {
+          Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
+          confirmationDialog.setTitle("Удаление");
+          confirmationDialog.setHeaderText("Вы действительно хотите удалить элемент?");
+          confirmationDialog.setContentText(serverPath);
+            Optional<ButtonType> option = confirmationDialog.showAndWait();
+            if (option.get() == ButtonType.OK) {
+                clientDownloader.deleteOnServerProcess(serverPath);
+            }
+        }
     }
 }

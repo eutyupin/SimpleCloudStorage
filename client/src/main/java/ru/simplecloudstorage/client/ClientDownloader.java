@@ -1,8 +1,11 @@
 package ru.simplecloudstorage.client;
 
 import io.netty.channel.Channel;
+import ru.simplecloudstorage.ClientApp;
+import ru.simplecloudstorage.commands.DeleteCommand;
 import ru.simplecloudstorage.commands.DownloadRequestCommand;
 import ru.simplecloudstorage.commands.UploadFileCommand;
+import ru.simplecloudstorage.controllers.MainWindow;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -13,6 +16,7 @@ public class ClientDownloader {
     private final Channel clientChannel;
     private final ExecutorService threadPool;
     private static final int BUFFER_SIZE = 64 * 1024;
+    private MainWindow mainWindow;
 
     public ClientDownloader(Channel clientChannel) {
         this.clientChannel = clientChannel;
@@ -31,6 +35,7 @@ public class ClientDownloader {
     }
 
     private void fileUploadProcess(String path, String destinationPath) {
+        double percentage = 0.0;
         try (RandomAccessFile uploadedFile = new RandomAccessFile(path, "r")) {
             long fileLength = uploadedFile.length();
             do {
@@ -53,14 +58,30 @@ public class ClientDownloader {
                 uploadFileCommand.setFilePath(destinationPath);
                 uploadFileCommand.setEndOfFile(endOfFile);
                 clientChannel.writeAndFlush(uploadFileCommand).sync();
+                percentage = (double) position / (double) fileLength;
+                mainWindow.progressBar.setProgress(percentage);
+                mainWindow.downloadButton.setDisable(true);
+                mainWindow.uploadButton.setDisable(true);
             } while (uploadedFile.getFilePointer() < uploadedFile.length());
-
+            mainWindow.downloadButton.setDisable(false);
+            mainWindow.uploadButton.setDisable(false);
+            mainWindow.progressBar.setProgress(0);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void deleteOnServerProcess(String path) {
+        DeleteCommand deleteCommand = new DeleteCommand();
+        deleteCommand.setDestinationPath(path);
+        clientChannel.writeAndFlush(deleteCommand);
+    }
+
     public ExecutorService getThreadPool() {
         return threadPool;
+    }
+
+    public void setMainWindow(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
     }
 }

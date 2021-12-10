@@ -5,6 +5,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.services.AuthorizeService;
 import ru.simplecloudstorage.services.RegisterService;
+import ru.simplecloudstorage.util.ServerUserUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,6 +56,18 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             checkUploadFileCommand(command, ctx);
             checkAuthCommand(command, ctx);
             checkRegisterCommand(command, ctx);
+            checkDeleteCommand(command, ctx);
+    }
+
+    private void checkDeleteCommand(BaseCommand command, ChannelHandlerContext ctx) {
+        if (command.getType().equals(CommandType.DELETE)) {
+            DeleteCommand deleteCommand = (DeleteCommand) command;
+            Path deletePath = Paths.get(APP_ROOT_PATH, deleteCommand.getDestinationPath());
+            if (ServerUserUtils.delete(deletePath)) {
+                ctx.writeAndFlush(updateServerFileList(login));
+            }
+
+        }
     }
 
     private void checkAuthCommand(BaseCommand command, ChannelHandlerContext ctx) {
@@ -68,7 +81,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 ctx.writeAndFlush(returnedCommand);
                 if (returnedCommand.getType().equals(CommandType.AUTH_OK)) {
                     login = authCommand.getLogin();
-                    ctx.writeAndFlush(updateServerFileList(authCommand.getLogin()));
+                    ctx.writeAndFlush(updateServerFileList(login));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -79,6 +92,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private BaseCommand updateServerFileList(String login) {
         ServerFileListCommand serverFileListCommand = new ServerFileListCommand();
         clientPath = Paths.get(APP_ROOT_PATH + login);
+        clientPathsList.clear();
         createClientPathsList(clientPath, login);
         serverFileListCommand.setFileList(clientPathsList);
         serverFileListCommand.setRootDirectory(login);

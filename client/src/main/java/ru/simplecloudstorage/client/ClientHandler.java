@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.commands.*;
+import ru.simplecloudstorage.controllers.MainWindow;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
@@ -29,6 +30,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private final String REGISTER_TEXT = "Попробуйте авторизоваться используя форму авторизации";
 
     private ClientApp application;
+    private MainWindow mainWindow;
     private TreeItem<String> leftViewItems;
 
     @Override
@@ -113,23 +115,35 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     }
 
     private void checkDownloadFileCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
+        double percentage = 0.0;
         if (command.getType().equals(CommandType.DOWNLOAD_FILE)) {
             DownloadFileCommand downloadFileCommand = (DownloadFileCommand) command;
-            System.out.println(downloadFileCommand.getDestinationPath());
             try(RandomAccessFile downloadedFile = new RandomAccessFile(downloadFileCommand.getDestinationPath(), "rw")) {
                 downloadedFile.seek(downloadFileCommand.getStartPosition());
                 downloadedFile.write(downloadFileCommand.getContent());
+                mainWindow.downloadButton.setDisable(true);
+                mainWindow.uploadButton.setDisable(true);
+                percentage = (double) downloadFileCommand.getStartPosition() / (double) downloadFileCommand.getTotalFileLength();
+                mainWindow.progressBar.setProgress(percentage);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+                Platform.runLater(() -> {
+                    new ErrorDialog("Ошибка", "Ошибка скачивания файла", e.getMessage());
+                });
             }
             if (downloadFileCommand.isEndOfFile()) {
+                mainWindow.downloadButton.setDisable(false);
+                mainWindow.uploadButton.setDisable(false);
+                mainWindow.progressBar.setProgress(0);
                 application.getMainWindow().setRightView();
             }
         }
     }
 
+    public void setMainWindow(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
+    }
 
     public void setApplication(ClientApp application) {
         this.application = application;

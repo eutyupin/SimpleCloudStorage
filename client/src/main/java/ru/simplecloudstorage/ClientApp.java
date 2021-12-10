@@ -147,6 +147,7 @@ public class ClientApp extends Application {
 
     public void mainWindowSetDownloader(ClientDownloader clientDownloader) {
         mainWindow.setDownloader(clientDownloader);
+
     }
 
     public MainWindow getMainWindow() {
