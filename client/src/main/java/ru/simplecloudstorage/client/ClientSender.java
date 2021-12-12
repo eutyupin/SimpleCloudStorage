@@ -75,7 +75,7 @@ public class ClientSender {
             mainWindow.uploadButton.setDisable(false);
             mainWindow.progressBar.setProgress(0);
             logger.info(String.format("Command %s received. Total %d bytes sent to server",
-                    uploadFileCommand.getClass().getName(), uploadFileCommand.getTotalFileLength()));
+                    uploadFileCommand.getClass().getSimpleName(), uploadFileCommand.getTotalFileLength()));
         } catch (InterruptedException | IOException e) {
             logger.error(e.getStackTrace().toString());
         }

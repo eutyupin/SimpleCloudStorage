@@ -52,12 +52,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
             new InformationDialog(REGISTER, REGISTER_TITLE, REGISTER_TEXT);
             ClientApp.authDialogSetRoot(SceneName.AUTH_DIALOG.getValue(), SceneName.REGISTER_WINDOW.getValue());
             });
-            logger.info(String.format("Command %s received. Registration OK.", command.getClass().getName()));
+            logger.info(String.format("Command %s received. Registration OK.", command.getClass().getSimpleName()));
         }
         if (command.getType().equals(CommandType.REGISTER_FALIED)) {
             RegisterFailedCommand registerFailedCommand = (RegisterFailedCommand) command;
             logger.info(String.format("Command %s received. Registration failed with message %s",
-                    registerFailedCommand.getClass().getName(), registerFailedCommand.getMessage()));
+                    registerFailedCommand.getClass().getSimpleName(), registerFailedCommand.getMessage()));
             Platform.runLater(() -> {
             new ErrorDialog(ERROR, ERROR_TITLE, registerFailedCommand.getMessage());
             });
@@ -67,12 +67,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void checkAuthOkCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
         if (command.getType().equals(CommandType.AUTH_OK)) {
             application.authDialogClose();
-            logger.info(String.format("Command %s received. Authorization OK.", command.getClass().getName()));
+            logger.info(String.format("Command %s received. Authorization OK.", command.getClass().getSimpleName()));
         }
         if (command.getType().equals(CommandType.AUTH_FAILED)) {
             AuthFailedCommand authFailedCommand = (AuthFailedCommand) command;
             logger.info(String.format("Command %s received. Authorization failed with message %s"),
-                    authFailedCommand.getClass().getName(), authFailedCommand.getMessage());
+                    authFailedCommand.getClass().getSimpleName(), authFailedCommand.getMessage());
             Platform.runLater(() -> {
                 new ErrorDialog(ERROR, ERROR_TITLE, authFailedCommand.getMessage());
                 application.getAuthDialog().prepareFieldsForLogin();
@@ -85,7 +85,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
             ServerFileListCommand serverFileListCommand = (ServerFileListCommand) command;
             getTreeItemFromList(serverFileListCommand.getFileList(), serverFileListCommand.getRootDirectory());
             application.getMainWindow().setLeftView(leftViewItems);
-            logger.info(String.format("Command %s received. Server file list received.", serverFileListCommand.getClass().getName()));
+            logger.info(String.format("Command %s received. Server file list received.", serverFileListCommand.getClass().getSimpleName()));
         }
     }
 
@@ -145,7 +145,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 mainWindow.progressBar.setProgress(0);
                 application.getMainWindow().setRightView();
                 logger.info(String.format("Command %s received. Total %d bytes received",
-                        downloadFileCommand.getClass().getName(), downloadFileCommand.getTotalFileLength()));
+                        downloadFileCommand.getClass().getSimpleName(), downloadFileCommand.getTotalFileLength()));
             }
         }
     }
