@@ -1,6 +1,9 @@
 package ru.simplecloudstorage.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.commands.*;
+import ru.simplecloudstorage.server.ServerHandler;
 import ru.simplecloudstorage.util.ClientCheckOrCreate;
 import ru.simplecloudstorage.util.DBCheckOrCreate;
 
@@ -14,7 +17,8 @@ public class AuthorizeService {
     private  Statement statement;
     private ResultSet resultSet;
     private String programRootPath = Paths.get("./").toUri().normalize().toString().substring(6);
-    private ExecutorService dbWorkThreadPool = Executors.newFixedThreadPool(1);
+    private ExecutorService dbWorkThreadPool = Executors.newSingleThreadExecutor();
+    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
         dbCheckOrCreate(dbURL);
@@ -25,8 +29,8 @@ public class AuthorizeService {
         dbWorkThreadPool.execute(() -> {
             try {
                 DBCheckOrCreate.tryCheckOrCreate(dbURL);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            } catch (SQLException e) {
+                logger.error(e.getMessage());
             }
         });
         dbWorkThreadPool.shutdownNow();
@@ -52,11 +56,11 @@ public class AuthorizeService {
             } else {
                 correctLogin = false;
                 correctPassword = false;
-                System.out.println("Error: " + errorMessage);
             }
         } catch (SQLException e) {
            correctLogin = false;
            correctPassword = false;
+           logger.error(e.getMessage());
         }
         finally {
             statement.close();
