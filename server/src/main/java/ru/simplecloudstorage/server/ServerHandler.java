@@ -107,7 +107,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                                 ServerFileListCommand.class.getSimpleName(), login));
                 }
             } catch (SQLException e) {
-                logger.error(e.getStackTrace().toString());
+                logger.error(e.getMessage());
             }
         }
     }
@@ -141,7 +141,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                     createClientPathsList(value, login);
                 }
             } catch (IOException e) {
-                logger.error(e.getStackTrace().toString());
+                logger.error(e.getMessage());
             }
         }
     }
@@ -156,7 +156,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 ctx.writeAndFlush(registerService.tryRegister(registerCommand.getLogin(), registerCommand.getPassword().hashCode(),
                         registerCommand.getEmail(), DB_URL));
             }catch (SQLException e) {
-                logger.error(e.getStackTrace().toString());
+                logger.error(e.getMessage());
             }
         }
     }
@@ -174,12 +174,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                             path));
                 }
             } catch (IOException e) {
-                logger.error(e.getStackTrace().toString());
+                logger.error(e.getMessage());
             }
             if (uploadFileCommand.isEndOfFile()) {
                 ctx.writeAndFlush(updateServerFileList(login));
             }
-
         }
     }
 
@@ -224,13 +223,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                     ctx.writeAndFlush(downloadFileCommand).sync();
                     if (endOfFile) {
                         logger.info(String.format("File downloaded to client. Path to download: %s Total %d bytes",
-                                APP_ROOT_PATH + downloadRequestCommand.getPath() + System.lineSeparator(),
+                                APP_ROOT_PATH + downloadRequestCommand.getPath(),
                                 fileLength));
                     }
                 } while (requestedFile.getFilePointer() < requestedFile.length());
 
             } catch (InterruptedException | IOException e) {
-                logger.error(e.getStackTrace().toString());
+                logger.error(e.getMessage());
             }
         }
     }

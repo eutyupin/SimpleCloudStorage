@@ -1,10 +1,17 @@
 package ru.simplecloudstorage.util;
 
-import java.sql.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DBCheckOrCreate {
 
     private  static Statement checkStatement;
+    private static final Logger logger = LoggerFactory.getLogger(DBCheckOrCreate.class);
 
     public static void tryCheckOrCreate(String dbURL) throws SQLException {
         try (Connection checkConnection = DriverManager.getConnection(dbURL)) {
@@ -20,7 +27,7 @@ public class DBCheckOrCreate {
                     "login_value_id INTEGER REFERENCES login (id) NOT NULL, email STRING NOT NULL);");
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage()); // at next time will logger in this place
+            logger.error(e.getMessage());
         }
         finally {
             checkStatement.close();

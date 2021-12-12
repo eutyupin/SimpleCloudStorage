@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.server.ServerConnector;
 
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,8 +22,10 @@ public class ServerApp {
             try {
                 ServerConnector.setPort(Integer.parseInt(args[0]));
             } catch (NumberFormatException e) {
-                logger.error(String.format("Entered port number %s is not a digit. Server will started with default port number - %d",
+                logger.warn(String.format("Entered port number %s is not a digit. Server will started with default port number - %d",
                         args[0], ServerConnector.getDefaultPortValue()));
+                System.out.printf("Entered port number %s is not a digit. Server will started with default port number - %d",
+                        args[0], ServerConnector.getDefaultPortValue());
             }
         } else ServerConnector.setPort(ServerConnector.getDefaultPortValue());
     }
@@ -34,7 +35,7 @@ public class ServerApp {
         try {
             new ServerConnector().run();
         } catch (InterruptedException e) {
-            logger.error(e.getStackTrace().toString());
+            logger.error(e.getMessage());
         }
     }
 }

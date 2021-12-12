@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 public class ServerConnector {
     private static int port;
     private static final int DEFAULT_PORT_VALUE = 8189;
-    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServerConnector.class);
 
     public void run() throws InterruptedException {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -48,9 +48,10 @@ public class ServerConnector {
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             Channel channel = server.bind(port).sync().channel();
             logger.info(String.format("Simple Cloud Storage Server started... Server port is: %d", port));
+            System.out.printf("Simple Cloud Storage Server started... Server port is: %d\n", port);
             channel.closeFuture().sync();
         } catch (Exception e) {
-            logger.error(e.getStackTrace().toString());
+            logger.error(e.getMessage());
         }
         finally {
             serverShutdown(bossGroup, workGroup, threadPool);

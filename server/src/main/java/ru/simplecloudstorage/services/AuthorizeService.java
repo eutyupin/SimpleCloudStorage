@@ -2,8 +2,9 @@ package ru.simplecloudstorage.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.simplecloudstorage.commands.*;
-import ru.simplecloudstorage.server.ServerHandler;
+import ru.simplecloudstorage.commands.AuthFailedCommand;
+import ru.simplecloudstorage.commands.AuthOkCommand;
+import ru.simplecloudstorage.commands.BaseCommand;
 import ru.simplecloudstorage.util.ClientCheckOrCreate;
 import ru.simplecloudstorage.util.DBCheckOrCreate;
 
@@ -67,7 +68,6 @@ public class AuthorizeService {
             resultSet.close();
         }
         if (correctLogin && correctPassword) {
-            System.out.println("User: " + login + " logging OK.");
             ClientCheckOrCreate.tryCheckClient(login, programRootPath);
             return authOkCommand;
         }
