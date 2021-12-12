@@ -3,7 +3,7 @@ package ru.simplecloudstorage.commands;
 public class AuthCommand extends BaseCommand {
 
     private String login;
-    private int passwordHash;
+    private String password;
 
     public AuthCommand() {
         super(CommandType.AUTH);
@@ -13,15 +13,15 @@ public class AuthCommand extends BaseCommand {
         return login;
     }
 
-    public int getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
     public void setLogin(String login) {
         this.login = login;
     }
 
-    public void setPasswordHash(int passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

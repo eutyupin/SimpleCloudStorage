@@ -8,30 +8,34 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import javafx.application.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.ClientApp;
+import ru.simplecloudstorage.commands.AuthCommand;
+import ru.simplecloudstorage.commands.RegisterCommand;
 import ru.simplecloudstorage.network.CustomFileDecoder;
 import ru.simplecloudstorage.network.CustomFileEncoder;
-import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.utils.ErrorDialog;
 
 public class ClientConnector {
-    private static int port;
-    private static String host;
-    private static final int DEFAULT_PORT_VALUE = 9000;
-    private static final String DEFAULT_HOST_VALUE = "localhost";
 
     private static NioEventLoopGroup workGroup;
     private static Bootstrap client;
     private static Channel clientChannel;
     private static ClientHandler clientHandler;
+    private ClientSender clientSender;
     private ClientApp application;
+    private boolean normalCloseApplication = false;
+    private static final Logger logger = LoggerFactory.getLogger(ClientConnector.class);
 
     public void run() {
-        setConnectParameters();
+
         try {
             workGroup = new NioEventLoopGroup(1);
             clientHandler = new ClientHandler();
             clientHandler.setApplication(application);
+            clientHandler.setMainWindow(application.getMainWindow());
             client = new Bootstrap()
                     .group(workGroup)
                     .channel(NioSocketChannel.class)
@@ -39,9 +43,9 @@ public class ClientConnector {
                         @Override
                         protected void initChannel(NioSocketChannel nioSocketChannel) {
                             nioSocketChannel.pipeline().addLast(
-                                    new LengthFieldBasedFrameDecoder(1024*128, 0,
-                                            2,0,2),
-                                    new LengthFieldPrepender(2),
+                                    new LengthFieldBasedFrameDecoder(1024*1024, 0,
+                                            3,0,3),
+                                    new LengthFieldPrepender(3),
                                     new CustomFileEncoder(),
                                     new CustomFileDecoder(),
                                     clientHandler
@@ -49,39 +53,43 @@ public class ClientConnector {
                         }
                     })
                     .option(ChannelOption.SO_KEEPALIVE, true);
-            clientChannel = client.connect(host, port).sync().channel();
-            ClientDownloader clientDownloader = new ClientDownloader(clientChannel);
-            application.mainWindowSetDownloader(clientDownloader);
+            clientChannel = client.connect(ClientApp.consoleHost, ClientApp.consolePort).sync().channel();
+            clientSender = new ClientSender(clientChannel);
+            application.mainWindowSetDownloader(clientSender);
             clientChannel.closeFuture().sync();
         } catch (Exception e) {
-                new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage());
+            if (!normalCloseApplication) {
+                logger.error(e.getMessage());
+                Platform.runLater(() -> new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage()));
+            }
         } finally {
             connectorShutdown();
+            logger.info("Application closed");
         }
     }
 
     public void connectorShutdown() {
+        clientSender.getThreadPool().shutdownNow();
+        clientChannel.close();
         workGroup.shutdownGracefully();
+        normalCloseApplication = true;
     }
 
-    public void userAuthorize(String login, int passwordHash) {
+    public void userAuthorize(String login, String password) {
         AuthCommand authCommand = new AuthCommand();
         authCommand.setLogin(login);
-        authCommand.setPasswordHash(passwordHash);
+        authCommand.setPassword(password);
         clientChannel.writeAndFlush(authCommand);
+        logger.info(String.format("Client %s trying to authorize", authCommand.getLogin()));
     }
 
-    public void userRegister(String login, int passwordHash, String email) {
+    public void userRegister(String login, String password, String email) {
         RegisterCommand registerCommand = new RegisterCommand();
         registerCommand.setLogin(login);
-        registerCommand.setPasswordHash(passwordHash);
+        registerCommand.setPassword(password);
         registerCommand.setEmail(email);
         clientChannel.writeAndFlush(registerCommand);
-    }
-
-    public static void setConnectParameters() {
-            host = DEFAULT_HOST_VALUE;
-            port = DEFAULT_PORT_VALUE;
+        logger.info(String.format("Client %s trying to register", registerCommand.getLogin()));
     }
 
     public void setApplication(ClientApp application) {

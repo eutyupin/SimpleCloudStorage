@@ -5,7 +5,7 @@
 
 <Pane id="registerPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="330.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.simplecloudstorage.controllers.RegisterDialog">
    <children>
-      <TextField fx:id="loginField" layoutX="107.0" layoutY="14.0" onKeyPressed="#loginFieldKeyPressed" prefWidth="205.0" />
+      <TextField fx:id="loginRegField" layoutX="107.0" layoutY="14.0" onKeyPressed="#loginFieldKeyPressed" prefWidth="205.0" />
       <PasswordField fx:id="pass1" layoutX="107.0" layoutY="54.0" onKeyPressed="#pass1KeyPressed" onKeyTyped="#pass1KeyTyped" prefWidth="205.0" />
       <PasswordField fx:id="pass2" layoutX="107.0" layoutY="99.0" onKeyPressed="#pass2KeyPressed" onKeyTyped="#pass2KeyTyped" prefWidth="205.0" />
       <TextField fx:id="emailField" layoutX="107.0" layoutY="143.0" onKeyPressed="#emailKeyPressed" onKeyTyped="#emailKeyTyped" prefWidth="205.0" />

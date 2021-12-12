@@ -1,20 +1,43 @@
 package ru.simplecloudstorage.services;
 
-import ru.simplecloudstorage.commands.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.simplecloudstorage.commands.AuthFailedCommand;
+import ru.simplecloudstorage.commands.AuthOkCommand;
+import ru.simplecloudstorage.commands.BaseCommand;
 import ru.simplecloudstorage.util.ClientCheckOrCreate;
 import ru.simplecloudstorage.util.DBCheckOrCreate;
 
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AuthorizeService {
 
     private  Statement statement;
     private ResultSet resultSet;
     private String programRootPath = Paths.get("./").toUri().normalize().toString().substring(6);
+    private ExecutorService dbWorkThreadPool = Executors.newSingleThreadExecutor();
+    private static final Logger logger = LoggerFactory.getLogger(AuthorizeService.class);
 
     public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
-        DBCheckOrCreate.tryCheckOrCreate(dbURL);
+        dbCheckOrCreate(dbURL);
+        return authCheck(login, passwordHash, dbURL);
+    }
+
+    private void dbCheckOrCreate(String dbURL) {
+        dbWorkThreadPool.execute(() -> {
+            try {
+                DBCheckOrCreate.tryCheckOrCreate(dbURL);
+            } catch (SQLException e) {
+                logger.error(e.getMessage());
+            }
+        });
+        dbWorkThreadPool.shutdownNow();
+    }
+
+    private BaseCommand authCheck(String login, int passwordHash, String dbURL) throws SQLException {
         AuthOkCommand authOkCommand = new AuthOkCommand();
         AuthFailedCommand authFailedCommand = new AuthFailedCommand();
         String errorMessage = "Неверный логин или пароль. Попробуйте еще раз или зарегистрируйтесь.";
@@ -34,18 +57,17 @@ public class AuthorizeService {
             } else {
                 correctLogin = false;
                 correctPassword = false;
-                System.out.println("Error: " + errorMessage);
             }
         } catch (SQLException e) {
            correctLogin = false;
            correctPassword = false;
+           logger.error(e.getMessage());
         }
         finally {
             statement.close();
             resultSet.close();
         }
         if (correctLogin && correctPassword) {
-            System.out.println("User: " + login + " logging OK.");
             ClientCheckOrCreate.tryCheckClient(login, programRootPath);
             return authOkCommand;
         }
