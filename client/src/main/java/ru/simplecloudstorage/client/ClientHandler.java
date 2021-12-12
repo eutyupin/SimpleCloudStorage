@@ -134,7 +134,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 percentage = (double) downloadFileCommand.getStartPosition() / (double) downloadFileCommand.getTotalFileLength();
                 mainWindow.getProgressBar().setProgress(percentage);
             } catch (IOException e) {
-                logger.error(e.getStackTrace().toString());
+                logger.error(e.getMessage());
                 Platform.runLater(() -> {
                     new ErrorDialog("Ошибка", "Ошибка скачивания файла", e.getMessage());
                 });

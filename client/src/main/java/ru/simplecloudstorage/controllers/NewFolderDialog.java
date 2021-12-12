@@ -25,7 +25,7 @@ public class NewFolderDialog {
 
 
     @FXML
-    public void textFieldKeyPresset(KeyEvent keyEvent) {
+    public void textFieldKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.ENTER)) okButtonAction();
     }
 

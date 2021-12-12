@@ -59,7 +59,7 @@ public class ClientConnector {
             clientChannel.closeFuture().sync();
         } catch (Exception e) {
             if (!normalCloseApplication) {
-                logger.error(e.getStackTrace().toString());
+                logger.error(e.getMessage());
                 Platform.runLater(() -> new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage()));
             }
         } finally {
