@@ -196,12 +196,20 @@ public class MainWindow implements Initializable {
 
     @FXML
     public void rightViewClicked(MouseEvent mouseEvent) {
-        clientPath = getViewItemPath(rightView);
+        try {
+            clientPath = getViewItemPath(rightView);
+        } catch (Exception e) {
+
+        }
     }
 
     @FXML
     public void leftViewClicked(MouseEvent mouseEvent) {
-        serverPath = getViewItemPath(leftView);
+        try {
+            serverPath = getViewItemPath(leftView);
+        } catch (Exception e) {
+
+        }
     }
 
     private String getViewItemPath(TreeView tree) {

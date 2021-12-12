@@ -9,6 +9,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.network.CustomFileDecoder;
 import ru.simplecloudstorage.network.CustomFileEncoder;
 
@@ -18,6 +20,7 @@ import java.util.concurrent.Executors;
 public class ServerConnector {
     private static int port;
     private static final int DEFAULT_PORT_VALUE = 8189;
+    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     public void run() throws InterruptedException {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -47,13 +50,15 @@ public class ServerConnector {
             System.out.printf("Simple Cloud Storage Server started...%sServer port is: %d",
                     System.lineSeparator(), port);
             channel.closeFuture().sync();
-        } finally {
-            {
+        } catch (Exception e) {
+            logger.error(e.getStackTrace().toString());
+        }
+        finally {
                 bossGroup.shutdownGracefully();
                 workGroup.shutdownGracefully();
                 threadPool.shutdownNow();
+                logger.info("Simple Cloud Storage Server stopped!...");
                 System.out.println("Simple Cloud Storage Server stopped!...");
-            }
         }
     }
 
