@@ -47,8 +47,6 @@ public class ServerConnector {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             Channel channel = server.bind(port).sync().channel();
-            System.out.println("Simple Cloud Storage Server started...");
-            System.out.println(String.format("Server port is: %d", port));
             logger.info(String.format("Simple Cloud Storage Server started... Server port is: %d", port));
             channel.closeFuture().sync();
         } catch (Exception e) {
@@ -64,7 +62,6 @@ public class ServerConnector {
         workGroup.shutdownGracefully();
         threadPool.shutdownNow();
         logger.info("Simple Cloud Storage Server stopped!...");
-        System.out.println("Simple Cloud Storage Server stopped!...");
     }
 
     public static int getDefaultPortValue() {
