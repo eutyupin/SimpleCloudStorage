@@ -18,7 +18,7 @@ public class AuthorizeService {
     private ResultSet resultSet;
     private String programRootPath = Paths.get("./").toUri().normalize().toString().substring(6);
     private ExecutorService dbWorkThreadPool = Executors.newSingleThreadExecutor();
-    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthorizeService.class);
 
     public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
         dbCheckOrCreate(dbURL);

@@ -9,6 +9,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.client.ClientSender;
 import ru.simplecloudstorage.controllers.AuthDialog;
@@ -24,6 +26,7 @@ public class ClientApp extends Application {
 
     private static final int DEFAULT_PORT_VALUE = 8189;
     private static final String DEFAULT_HOST_VALUE = "localhost";
+    private static final Logger logger = LoggerFactory.getLogger(ClientApp.class);
 
     private static Scene scene;
     private static Stage primaryStage;
@@ -129,6 +132,7 @@ public class ClientApp extends Application {
             authStage.sizeToScene();
         } catch (IOException e) {
             new ErrorDialog("Ошибка приложения", e.getMessage(), "Попробуйте еще раз");
+            logger.error(e.getMessage());
         }
     }
 
@@ -146,6 +150,7 @@ public class ClientApp extends Application {
             primaryStage.sizeToScene();
         } catch (IOException e) {
             new ErrorDialog("Ошибка приложения", e.getMessage(), "Попробуйте еще раз");
+            logger.error(e.getMessage());
         }
     }
 
@@ -159,11 +164,6 @@ public class ClientApp extends Application {
             connector.connectorShutdown();
             mainWorkPool.shutdownNow();
         });
-//        authStage.setOnHiding(event -> {
-//            Platform.runLater(()-> {
-//                primaryStage.close();
-//            });
-//        });
     }
 
     public static String getCurrentScene() {
