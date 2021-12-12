@@ -6,13 +6,14 @@ import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.controllers.MainWindow;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -27,6 +28,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private final String REGISTER = "Регистрация";
     private final String REGISTER_TITLE = "Регистрация прошла успешно!";
     private final String REGISTER_TEXT = "Попробуйте авторизоваться используя форму авторизации";
+    private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
     private ClientApp application;
     private MainWindow mainWindow;
@@ -50,9 +52,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
             new InformationDialog(REGISTER, REGISTER_TITLE, REGISTER_TEXT);
             ClientApp.authDialogSetRoot(SceneName.AUTH_DIALOG.getValue(), SceneName.REGISTER_WINDOW.getValue());
             });
+            logger.info(String.format("Command %s received. Registration OK.", command.getClass().getName()));
         }
         if (command.getType().equals(CommandType.REGISTER_FALIED)) {
             RegisterFailedCommand registerFailedCommand = (RegisterFailedCommand) command;
+            logger.info(String.format("Command %s received. Registration failed with message %s",
+                    registerFailedCommand.getClass().getName(), registerFailedCommand.getMessage()));
             Platform.runLater(() -> {
             new ErrorDialog(ERROR, ERROR_TITLE, registerFailedCommand.getMessage());
             });
@@ -62,9 +67,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void checkAuthOkCommand(BaseCommand command, ChannelHandlerContext channelHandlerContext) {
         if (command.getType().equals(CommandType.AUTH_OK)) {
             application.authDialogClose();
+            logger.info(String.format("Command %s received. Authorization OK.", command.getClass().getName()));
         }
         if (command.getType().equals(CommandType.AUTH_FAILED)) {
             AuthFailedCommand authFailedCommand = (AuthFailedCommand) command;
+            logger.info(String.format("Command %s received. Authorization failed with message %s"),
+                    authFailedCommand.getClass().getName(), authFailedCommand.getMessage());
             Platform.runLater(() -> {
                 new ErrorDialog(ERROR, ERROR_TITLE, authFailedCommand.getMessage());
                 application.getAuthDialog().prepareFieldsForLogin();
@@ -77,6 +85,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
             ServerFileListCommand serverFileListCommand = (ServerFileListCommand) command;
             getTreeItemFromList(serverFileListCommand.getFileList(), serverFileListCommand.getRootDirectory());
             application.getMainWindow().setLeftView(leftViewItems);
+            logger.info(String.format("Command %s received. Server file list received.", serverFileListCommand.getClass().getName()));
         }
     }
 
@@ -125,6 +134,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 percentage = (double) downloadFileCommand.getStartPosition() / (double) downloadFileCommand.getTotalFileLength();
                 mainWindow.progressBar.setProgress(percentage);
             } catch (IOException e) {
+                logger.error(e.getStackTrace().toString());
                 Platform.runLater(() -> {
                     new ErrorDialog("Ошибка", "Ошибка скачивания файла", e.getMessage());
                 });
@@ -134,6 +144,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 mainWindow.uploadButton.setDisable(false);
                 mainWindow.progressBar.setProgress(0);
                 application.getMainWindow().setRightView();
+                logger.info(String.format("Command %s received. Total %d bytes received",
+                        downloadFileCommand.getClass().getName(), downloadFileCommand.getTotalFileLength()));
             }
         }
     }

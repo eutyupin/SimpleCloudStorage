@@ -14,8 +14,6 @@ import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
-import java.io.IOException;
-
 public class AuthDialog {
 
     private final String ERROR = "Ошибка";

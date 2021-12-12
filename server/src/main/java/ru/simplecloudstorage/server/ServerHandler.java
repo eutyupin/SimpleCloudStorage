@@ -198,6 +198,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
     private void fileDownloadProcess(DownloadRequestCommand downloadRequestCommand, ChannelHandlerContext ctx) {
         String path = APP_ROOT_PATH + downloadRequestCommand.getPath();
+        DownloadFileCommand downloadFileCommand = new DownloadFileCommand();
         if(Files.isRegularFile(Path.of(path))) {
             try (RandomAccessFile requestedFile = new RandomAccessFile(path, "r")) {
                 long fileLength = requestedFile.length();
@@ -214,7 +215,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                         endOfFile = true;
                     }
                     requestedFile.read(bytes);
-                    DownloadFileCommand downloadFileCommand = new DownloadFileCommand();
+
                     downloadFileCommand.setDestinationPath(downloadRequestCommand.getDestinationPath() +
                             downloadRequestCommand.getPath().substring(downloadRequestCommand.getPath().lastIndexOf(File.separator),
                                     downloadRequestCommand.getPath().length()));

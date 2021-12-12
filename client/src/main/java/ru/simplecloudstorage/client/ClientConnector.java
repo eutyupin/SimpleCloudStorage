@@ -9,10 +9,13 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import javafx.application.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.ClientApp;
+import ru.simplecloudstorage.commands.AuthCommand;
+import ru.simplecloudstorage.commands.RegisterCommand;
 import ru.simplecloudstorage.network.CustomFileDecoder;
 import ru.simplecloudstorage.network.CustomFileEncoder;
-import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.utils.ErrorDialog;
 
 public class ClientConnector {
@@ -24,8 +27,10 @@ public class ClientConnector {
     private ClientSender clientSender;
     private ClientApp application;
     private boolean normalCloseApplication = false;
+    private static final Logger logger = LoggerFactory.getLogger(ClientConnector.class);
 
     public void run() {
+
         try {
             workGroup = new NioEventLoopGroup(1);
             clientHandler = new ClientHandler();
@@ -53,10 +58,13 @@ public class ClientConnector {
             application.mainWindowSetDownloader(clientSender);
             clientChannel.closeFuture().sync();
         } catch (Exception e) {
-            if (!normalCloseApplication)
-            Platform.runLater(() -> new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage()));
+            if (!normalCloseApplication) {
+                logger.error(e.getStackTrace().toString());
+                Platform.runLater(() -> new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage()));
+            }
         } finally {
             connectorShutdown();
+            logger.info("Application closed");
         }
     }
 
@@ -72,6 +80,7 @@ public class ClientConnector {
         authCommand.setLogin(login);
         authCommand.setPasswordHash(passwordHash);
         clientChannel.writeAndFlush(authCommand);
+        logger.info(String.format("Client %s trying to authorize", authCommand.getLogin()));
     }
 
     public void userRegister(String login, int passwordHash, String email) {
@@ -80,6 +89,7 @@ public class ClientConnector {
         registerCommand.setPasswordHash(passwordHash);
         registerCommand.setEmail(email);
         clientChannel.writeAndFlush(registerCommand);
+        logger.info(String.format("Client %s trying to register", registerCommand.getLogin()));
     }
 
     public void setApplication(ClientApp application) {

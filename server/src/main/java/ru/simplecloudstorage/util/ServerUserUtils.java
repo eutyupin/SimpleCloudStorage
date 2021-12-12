@@ -1,11 +1,16 @@
 package ru.simplecloudstorage.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.simplecloudstorage.server.ServerHandler;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public  class ServerUserUtils {
+    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     public static boolean delete (Path path) {
         if (Files.isDirectory(path)) {
@@ -25,7 +30,7 @@ public  class ServerUserUtils {
                 }
             }
             file.delete();
-            System.out.println("Deleted file/folder: " + file.getAbsolutePath());
+            logger.info("Deleted file/directory: " + file.getAbsolutePath());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -40,7 +45,7 @@ public  class ServerUserUtils {
             e.printStackTrace();
             return false;
         }
-        System.out.println("Deleted file: " + path.toString());
+        logger.info("Deleted file: " + path.toString());
         return true;
     }
 
@@ -51,7 +56,7 @@ public  class ServerUserUtils {
             e.printStackTrace();
             return false;
         }
-        System.out.println("Directory created: " + path.toString());
+        logger.info("Directory created: " + path.toString());
         return true;
     }
 }

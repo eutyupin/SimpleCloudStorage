@@ -1,6 +1,6 @@
 package ru.simplecloudstorage;
 
-//import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.PropertyConfigurator;
 import ru.simplecloudstorage.server.ServerConnector;
 
 public class ServerApp {
@@ -11,7 +11,7 @@ public class ServerApp {
     }
 
     private static void argumentSetParameters(String[] args) {
-//        PropertyConfigurator.configure("server/src/main/resources/log4j.properties");
+        PropertyConfigurator.configure("server/src/main/resources/log4jServer.properties");
         if (args.length > 0) {
             try {
                 ServerConnector.setPort(Integer.parseInt(args[0]));

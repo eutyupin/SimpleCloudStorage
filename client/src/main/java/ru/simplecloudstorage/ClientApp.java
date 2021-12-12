@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.log4j.PropertyConfigurator;
 import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.client.ClientSender;
 import ru.simplecloudstorage.controllers.AuthDialog;
@@ -54,6 +55,7 @@ public class ClientApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        PropertyConfigurator.configure("src/main/resources/log4jClient.properties");
         mainWorkPool = Executors.newSingleThreadExecutor();
         primaryStage = stage;
         scene = new Scene(loadFXML(SceneName.MAIN_WINDOW.getValue()));

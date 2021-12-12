@@ -1,12 +1,13 @@
 package ru.simplecloudstorage.client;
 
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.commands.DeleteCommand;
 import ru.simplecloudstorage.commands.DownloadRequestCommand;
 import ru.simplecloudstorage.commands.NewDirectoryCommand;
 import ru.simplecloudstorage.commands.UploadFileCommand;
 import ru.simplecloudstorage.controllers.MainWindow;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +18,7 @@ public class ClientSender {
     private final ExecutorService threadPool;
     private static final int BUFFER_SIZE = 256 * 1024;
     private MainWindow mainWindow;
+    private static final Logger logger = LoggerFactory.getLogger(ClientSender.class);
 
     public ClientSender(Channel clientChannel) {
         this.clientChannel = clientChannel;
@@ -42,6 +44,7 @@ public class ClientSender {
 
     private void fileUploadProcess(String path, String destinationPath) {
         double percentage = 0.0;
+        UploadFileCommand uploadFileCommand = new UploadFileCommand();
         try (RandomAccessFile uploadedFile = new RandomAccessFile(path, "r")) {
             long fileLength = uploadedFile.length();
             do {
@@ -57,7 +60,6 @@ public class ClientSender {
                     endOfFile = true;
                 }
                 uploadedFile.read(bytes);
-                UploadFileCommand uploadFileCommand = new UploadFileCommand();
                 uploadFileCommand.setTotalFileLength(fileLength);
                 uploadFileCommand.setStartPosition(position);
                 uploadFileCommand.setContent(bytes);
@@ -72,8 +74,10 @@ public class ClientSender {
             mainWindow.downloadButton.setDisable(false);
             mainWindow.uploadButton.setDisable(false);
             mainWindow.progressBar.setProgress(0);
+            logger.info(String.format("Command %s received. Total %d bytes sent to server",
+                    uploadFileCommand.getClass().getName(), uploadFileCommand.getTotalFileLength()));
         } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         }
     }
 
@@ -81,6 +85,7 @@ public class ClientSender {
         DeleteCommand deleteCommand = new DeleteCommand();
         deleteCommand.setDestinationPath(path);
         clientChannel.writeAndFlush(deleteCommand);
+        logger.info(String.format("File %s deleted on server", path));
     }
 
     public ExecutorService getThreadPool() {
