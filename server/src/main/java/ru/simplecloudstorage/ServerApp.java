@@ -23,8 +23,6 @@ public class ServerApp {
             try {
                 ServerConnector.setPort(Integer.parseInt(args[0]));
             } catch (NumberFormatException e) {
-                System.out.println("Entered port number is not a digit." + System.lineSeparator()+
-                        "Server will started with default port number - 9000" + System.lineSeparator());
                 logger.error(String.format("Entered port number %s is not a digit. Server will started with default port number - %d",
                         args[0], ServerConnector.getDefaultPortValue()));
             }

@@ -41,13 +41,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) {
-        System.out.println("Client trying to connect... Waiting authorization...");
         logger.info("Client trying to connect... Waiting authorization...");
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) {
-        System.out.println("Client disconnected");
         logger.info("Client disconnected");
     }
 
