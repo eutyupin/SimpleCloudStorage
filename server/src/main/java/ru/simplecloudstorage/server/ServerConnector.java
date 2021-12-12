@@ -47,19 +47,24 @@ public class ServerConnector {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             Channel channel = server.bind(port).sync().channel();
-            System.out.printf("Simple Cloud Storage Server started...%sServer port is: %d",
-                    System.lineSeparator(), port);
+            System.out.println("Simple Cloud Storage Server started...");
+            System.out.println(String.format("Server port is: %d", port));
+            logger.info(String.format("Simple Cloud Storage Server started... Server port is: %d", port));
             channel.closeFuture().sync();
         } catch (Exception e) {
             logger.error(e.getStackTrace().toString());
         }
         finally {
-                bossGroup.shutdownGracefully();
-                workGroup.shutdownGracefully();
-                threadPool.shutdownNow();
-                logger.info("Simple Cloud Storage Server stopped!...");
-                System.out.println("Simple Cloud Storage Server stopped!...");
+            serverShutdown(bossGroup, workGroup, threadPool);
         }
+    }
+
+    private void serverShutdown(NioEventLoopGroup bossGroup, NioEventLoopGroup workGroup, ExecutorService threadPool) {
+        bossGroup.shutdownGracefully();
+        workGroup.shutdownGracefully();
+        threadPool.shutdownNow();
+        logger.info("Simple Cloud Storage Server stopped!...");
+        System.out.println("Simple Cloud Storage Server stopped!...");
     }
 
     public static int getDefaultPortValue() {
@@ -73,4 +78,5 @@ public class ServerConnector {
     public static void setPort(int port) {
         ServerConnector.port = port;
     }
+    public static void shutdown() {}
 }
