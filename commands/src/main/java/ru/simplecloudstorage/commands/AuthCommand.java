@@ -2,7 +2,8 @@ package ru.simplecloudstorage.commands;
 
 public class AuthCommand extends BaseCommand {
 
-    private String login, password;
+    private String login;
+    private String password;
 
     public AuthCommand() {
         super(CommandType.AUTH);

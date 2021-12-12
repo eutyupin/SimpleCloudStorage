@@ -2,7 +2,8 @@ package ru.simplecloudstorage.commands;
 
 public class RegisterCommand extends BaseCommand{
 
-    private String login, password, email;
+    private String login, email;
+    private String password;
 
     public RegisterCommand() {
         super(CommandType.REGISTER);
