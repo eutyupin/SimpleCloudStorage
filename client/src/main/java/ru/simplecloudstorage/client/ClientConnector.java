@@ -23,6 +23,7 @@ public class ClientConnector {
     private static ClientHandler clientHandler;
     private ClientSender clientSender;
     private ClientApp application;
+    private boolean normalCloseApplication = false;
 
     public void run() {
         try {
@@ -38,8 +39,8 @@ public class ClientConnector {
                         protected void initChannel(NioSocketChannel nioSocketChannel) {
                             nioSocketChannel.pipeline().addLast(
                                     new LengthFieldBasedFrameDecoder(1024*1024, 0,
-                                            4,0,4),
-                                    new LengthFieldPrepender(4),
+                                            3,0,3),
+                                    new LengthFieldPrepender(3),
                                     new CustomFileEncoder(),
                                     new CustomFileDecoder(),
                                     clientHandler
@@ -52,6 +53,7 @@ public class ClientConnector {
             application.mainWindowSetDownloader(clientSender);
             clientChannel.closeFuture().sync();
         } catch (Exception e) {
+            if (!normalCloseApplication)
             Platform.runLater(() -> new ErrorDialog("Ошибка", "ошибка соединения с сервером", e.getMessage()));
         } finally {
             connectorShutdown();
@@ -62,6 +64,7 @@ public class ClientConnector {
         clientSender.getThreadPool().shutdownNow();
         clientChannel.close();
         workGroup.shutdownGracefully();
+        normalCloseApplication = true;
     }
 
     public void userAuthorize(String login, int passwordHash) {

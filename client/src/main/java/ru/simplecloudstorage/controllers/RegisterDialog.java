@@ -23,11 +23,11 @@ public class RegisterDialog {
     private static ClientConnector connector;
 
     @FXML
-    public TextField emailField;
+    private TextField emailField;
     @FXML
-    public TextField loginField;
+    private Button okButton;
     @FXML
-    public Button okButton;
+    private TextField loginRegField;
     @FXML
     private PasswordField pass2;
     @FXML
@@ -61,15 +61,15 @@ public class RegisterDialog {
 
     private void registerAction() {
         if (checkFieldsHaveText()) {
-            connector.userRegister(loginField.getText(), pass1.getText().hashCode(), emailField.getText());
+            connector.userRegister(loginRegField.getText(), pass1.getText().hashCode(), emailField.getText());
         } else {
             new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
         }
     }
 
     private boolean checkFieldsHaveText() {
-        if (loginField.getText().isEmpty()) {
-            loginField.requestFocus();
+        if (loginRegField.getText().isEmpty()) {
+            loginRegField.requestFocus();
             return false;
         }
         if (pass1.getText().isEmpty()) {

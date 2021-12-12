@@ -53,8 +53,9 @@ public class AuthDialog {
 
     @FXML
     private void okButtonKeyPressed(KeyEvent keyEvent) {
-        loginActions();
-        application.getMainWindow().setLogin(loginField.getText());
+        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+            loginActions();
+        }
     }
 
     @FXML

@@ -33,8 +33,8 @@ public class ServerConnector {
                         protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
                             nioSocketChannel.pipeline().addLast(
                                     new LengthFieldBasedFrameDecoder(1024*1024, 0,
-                                            4,0,4),
-                                    new LengthFieldPrepender(4),
+                                            3,0,3),
+                                    new LengthFieldPrepender(3),
                                     new CustomFileEncoder(),
                                     new CustomFileDecoder(),
                                     serverHandler
@@ -44,8 +44,8 @@ public class ServerConnector {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             Channel channel = server.bind(port).sync().channel();
-            System.out.println("Simple Cloud Storage Server started..." +
-                    System.lineSeparator() + "Server port is: " + port);
+            System.out.printf("Simple Cloud Storage Server started...%sServer port is: %d",
+                    System.lineSeparator(), port);
             channel.closeFuture().sync();
         } finally {
             {

@@ -16,8 +16,6 @@ import javafx.scene.layout.HBox;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.client.ClientSender;
 import ru.simplecloudstorage.utils.InformationDialog;
-import ru.simplecloudstorage.utils.SceneName;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -32,13 +30,10 @@ public class MainWindow implements Initializable {
 
     private String serverPath;
     private String clientPath;
-    private String login;
     private double pr = 0;
 
     @FXML
     public ProgressBar progressBar;
-    @FXML
-    public MenuItem settingsMenu;
     @FXML
     public Button uploadButton;
     @FXML
@@ -59,6 +54,7 @@ public class MainWindow implements Initializable {
     private HBox leftPane;
     @FXML
     private HBox rightPane;
+
     private ClientApp application;
     private ClientSender clientSender;
     private  List<String> excludeList;
@@ -221,10 +217,6 @@ public class MainWindow implements Initializable {
         return tempPathToFile.substring(0, tempPathToFile.length()-1);
     }
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
     @FXML
     public void downloadAction(ActionEvent actionEvent) {
         clientSender.fileDownloadFromServer(serverPath, clientPath);
@@ -232,7 +224,7 @@ public class MainWindow implements Initializable {
 
     @FXML
     public void deleteAction(ActionEvent actionEvent) {
-        if (serverPath.length() > (login.length() + File.separator.length())) {
+        if (leftView.getSelectionModel().getSelectedIndex() > 0) {
           Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
           confirmationDialog.setTitle("Удаление");
           confirmationDialog.setHeaderText("Вы действительно хотите удалить элемент?");

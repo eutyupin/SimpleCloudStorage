@@ -1,7 +1,6 @@
 package ru.simplecloudstorage.client;
 
 import io.netty.channel.Channel;
-import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.commands.DeleteCommand;
 import ru.simplecloudstorage.commands.DownloadRequestCommand;
 import ru.simplecloudstorage.commands.NewDirectoryCommand;
@@ -16,7 +15,7 @@ import java.util.concurrent.Executors;
 public class ClientSender {
     private final Channel clientChannel;
     private final ExecutorService threadPool;
-    private static final int BUFFER_SIZE = 64 * 1024;
+    private static final int BUFFER_SIZE = 128 * 1024;
     private MainWindow mainWindow;
 
     public ClientSender(Channel clientChannel) {

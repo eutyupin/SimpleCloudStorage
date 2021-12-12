@@ -2,13 +2,14 @@ package ru.simplecloudstorage.server;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.services.AuthorizeService;
 import ru.simplecloudstorage.services.RegisterService;
 import ru.simplecloudstorage.util.ServerUserUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -22,15 +23,16 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
-
+    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
     private final String APP_ROOT_PATH = Paths.get("./").toAbsolutePath().normalize().toString() + File.separator;
     private final String APP_ROOT_URI = Paths.get("./").toUri().normalize().toString().substring(6);
     private final String DB_URL = "jdbc:sqlite:" + APP_ROOT_URI + "base.db";
-    private static final int BUFFER_SIZE = 64 * 1024;
+    private static final int BUFFER_SIZE = 128 * 1024;
     private final Executor executor;
     private List<String> clientPathsList = new ArrayList<>();
     private Path clientPath;
     private String login;
+
 
     public ServerHandler(Executor executor) {
         this.executor = executor;
@@ -39,11 +41,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) {
         System.out.println("Client trying to connect... Waiting authorization...");
+        logger.info("Client trying to connect... Waiting authorization...");
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) {
         System.out.println("Client disconnected");
+        logger.info("Client disconnected");
     }
 
     @Override
@@ -67,6 +71,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             if (ServerUserUtils.createNewDirectory(newDirectory)) {
                 ctx.writeAndFlush(updateServerFileList(login));
             }
+            logger.info(String.format("Command %s received. New directory created %s",
+                    newDirectoryCommand.getClass().getSimpleName(), newDirectoryCommand.getPath()));
         }
     }
 
@@ -77,7 +83,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             if (ServerUserUtils.delete(deletePath)) {
                 ctx.writeAndFlush(updateServerFileList(login));
             }
-
+            logger.info(String.format("Command %s received. Directory %s was deleted",
+                    deleteCommand.getClass().getSimpleName(), deleteCommand.getDestinationPath()));
         }
     }
 
@@ -85,6 +92,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
         if (command.getType().equals(CommandType.AUTH)) {
             AuthCommand authCommand = (AuthCommand) command;
             AuthorizeService authorizeService = new AuthorizeService();
+            logger.info(String.format("Command %s received. User %s trying authorize",
+                    authCommand.getClass().getSimpleName(), authCommand.getLogin()));
 
             try {
                 BaseCommand returnedCommand = authorizeService.tryAuthorize(authCommand.getLogin(),
@@ -93,8 +102,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 if (returnedCommand.getType().equals(CommandType.AUTH_OK)) {
                     login = authCommand.getLogin();
                     ctx.writeAndFlush(updateServerFileList(login));
+                        logger.info(String.format("Command %s received. User %s authorized",
+                                AuthOkCommand.class.getSimpleName(), authCommand.getLogin()));
+                        logger.info(String.format("Command %s received. File list for user %s is updated",
+                                ServerFileListCommand.class.getSimpleName(), login));
                 }
             } catch (SQLException e) {
+
                 e.printStackTrace();
             }
         }
@@ -139,10 +153,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             RegisterCommand registerCommand = (RegisterCommand) command;
             RegisterService registerService = new RegisterService();
             try {
-                System.out.println("User: " + registerCommand.getLogin() + " trying register");
+                logger.info(String.format("Command %s received. User %s trying to register",
+                        registerCommand.getClass().getSimpleName(), registerCommand.getLogin()));
                 ctx.writeAndFlush(registerService.tryRegister(registerCommand.getLogin(), registerCommand.getPasswordHash(),
                         registerCommand.getEmail(), DB_URL));
-
             }catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -152,9 +166,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void checkUploadFileCommand(BaseCommand command, ChannelHandlerContext ctx) {
         if (command.getType().equals(CommandType.UPLOAD_FILE)) {
             UploadFileCommand uploadFileCommand = (UploadFileCommand) command;
-            System.out.println("UploadFileCommand received" + System.lineSeparator() +
-                    "Path to download: " + APP_ROOT_PATH + uploadFileCommand.getFilePath());
             String path = APP_ROOT_PATH + uploadFileCommand.getFilePath();
+            logger.info(String.format("Command %s received. Path to download: %s ",
+                    uploadFileCommand.getClass().getSimpleName(),
+                    path));
             try(RandomAccessFile uploadFile = new RandomAccessFile(path, "rw")) {
                 uploadFile.seek(uploadFileCommand.getStartPosition());
                 uploadFile.write(uploadFileCommand.getContent());
@@ -163,14 +178,20 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             }
             if (uploadFileCommand.isEndOfFile()) {
                 ctx.writeAndFlush(updateServerFileList(login));
+
             }
+
         }
     }
 
     private void checkDownloadRequestCommand(BaseCommand command, ChannelHandlerContext ctx) {
         if (command.getType().equals(CommandType.DOWNLOAD_REQUEST)) {
             DownloadRequestCommand downloadRequestCommand = (DownloadRequestCommand) command;
+            logger.info(String.format("Command %s received. Path to download: %s ",
+                    downloadRequestCommand.getClass().getSimpleName(), APP_ROOT_PATH +
+                            downloadRequestCommand.getPath()));
             executor.execute(() -> fileDownloadProcess(downloadRequestCommand, (ctx)));
+
         }
     }
 
@@ -211,7 +232,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        System.out.println("Exception: " + cause.getMessage());
+        logger.error("Error: " , cause);
         cause.printStackTrace();
         ctx.close();
     }

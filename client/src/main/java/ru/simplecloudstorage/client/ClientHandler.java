@@ -14,7 +14,6 @@ import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
@@ -34,7 +33,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private TreeItem<String> leftViewItems;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, BaseCommand command) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, BaseCommand command) {
         checkCommands(command, channelHandlerContext);
     }
 
@@ -84,7 +83,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void getTreeItemFromList(List<String> pathsList, String login) {
         leftViewItems = new TreeItem<>(login);
         leftViewItems.setGraphic(new ImageView(new Image("folder.png")));
-        boolean isDir = false;
+        if (pathsList.size() == 0) pathsList.add("D:" + login);
         treeItemsAdd(pathsList);
     }
 
@@ -125,8 +124,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 mainWindow.uploadButton.setDisable(true);
                 percentage = (double) downloadFileCommand.getStartPosition() / (double) downloadFileCommand.getTotalFileLength();
                 mainWindow.progressBar.setProgress(percentage);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 Platform.runLater(() -> {
                     new ErrorDialog("Ошибка", "Ошибка скачивания файла", e.getMessage());
