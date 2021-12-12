@@ -75,18 +75,18 @@ public class ClientConnector {
         normalCloseApplication = true;
     }
 
-    public void userAuthorize(String login, int passwordHash) {
+    public void userAuthorize(String login, String password) {
         AuthCommand authCommand = new AuthCommand();
         authCommand.setLogin(login);
-        authCommand.setPasswordHash(passwordHash);
+        authCommand.setPassword(password);
         clientChannel.writeAndFlush(authCommand);
         logger.info(String.format("Client %s trying to authorize", authCommand.getLogin()));
     }
 
-    public void userRegister(String login, int passwordHash, String email) {
+    public void userRegister(String login, String password, String email) {
         RegisterCommand registerCommand = new RegisterCommand();
         registerCommand.setLogin(login);
-        registerCommand.setPasswordHash(passwordHash);
+        registerCommand.setPassword(password);
         registerCommand.setEmail(email);
         clientChannel.writeAndFlush(registerCommand);
         logger.info(String.format("Client %s trying to register", registerCommand.getLogin()));

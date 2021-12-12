@@ -67,13 +67,13 @@ public class ClientSender {
                 uploadFileCommand.setEndOfFile(endOfFile);
                 clientChannel.writeAndFlush(uploadFileCommand).sync();
                 percentage = (double) position / (double) fileLength;
-                mainWindow.progressBar.setProgress(percentage);
-                mainWindow.downloadButton.setDisable(true);
-                mainWindow.uploadButton.setDisable(true);
+                mainWindow.getProgressBar().setProgress(percentage);
+                mainWindow.getDownloadButton().setDisable(true);
+                mainWindow.getUploadButton().setDisable(true);
             } while (uploadedFile.getFilePointer() < uploadedFile.length());
-            mainWindow.downloadButton.setDisable(false);
-            mainWindow.uploadButton.setDisable(false);
-            mainWindow.progressBar.setProgress(0);
+            mainWindow.getDownloadButton().setDisable(false);
+            mainWindow.getUploadButton().setDisable(false);
+            mainWindow.getProgressBar().setProgress(0);
             logger.info(String.format("Command %s received. Total %d bytes sent to server",
                     uploadFileCommand.getClass().getSimpleName(), uploadFileCommand.getTotalFileLength()));
         } catch (InterruptedException | IOException e) {

@@ -60,7 +60,7 @@ public class RegisterDialog {
 
     private void registerAction() {
         if (checkFieldsHaveText()) {
-            connector.userRegister(loginRegField.getText(), pass1.getText().hashCode(), emailField.getText());
+            connector.userRegister(loginRegField.getText(), pass1.getText(), emailField.getText());
         } else {
             new ErrorDialog(ERROR, ERROR_TITLE, ERROR_DESCRIPTION);
         }

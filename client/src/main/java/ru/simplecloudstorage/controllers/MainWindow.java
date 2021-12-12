@@ -33,15 +33,15 @@ public class MainWindow implements Initializable {
     private double pr = 0;
 
     @FXML
-    public ProgressBar progressBar;
+    private ProgressBar progressBar;
     @FXML
-    public Button uploadButton;
+    private Button uploadButton;
     @FXML
-    public Button deleteButton;
+    private Button deleteButton;
     @FXML
-    public Button newFolderButton;
+    private Button newFolderButton;
     @FXML
-    public Button downloadButton;
+    private Button downloadButton;
     @FXML
     private ComboBox diskBox;
     @FXML
@@ -252,5 +252,19 @@ public class MainWindow implements Initializable {
         application.getNewFolderDialogStage().showAndWait();
     }
 
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
 
+    public Button getUploadButton() {
+        return uploadButton;
+    }
+
+    public Button getNewFolderButton() {
+        return newFolderButton;
+    }
+
+    public Button getDownloadButton() {
+        return downloadButton;
+    }
 }

@@ -98,7 +98,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
 
             try {
                 BaseCommand returnedCommand = authorizeService.tryAuthorize(authCommand.getLogin(),
-                        authCommand.getPasswordHash(), DB_URL);
+                        authCommand.getPassword().hashCode(), DB_URL);
                 ctx.writeAndFlush(returnedCommand);
                 if (returnedCommand.getType().equals(CommandType.AUTH_OK)) {
                     login = authCommand.getLogin();
@@ -155,7 +155,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             try {
                 logger.info(String.format("Command %s received. User %s trying to register",
                         registerCommand.getClass().getSimpleName(), registerCommand.getLogin()));
-                ctx.writeAndFlush(registerService.tryRegister(registerCommand.getLogin(), registerCommand.getPasswordHash(),
+                ctx.writeAndFlush(registerService.tryRegister(registerCommand.getLogin(), registerCommand.getPassword().hashCode(),
                         registerCommand.getEmail(), DB_URL));
             }catch (SQLException e) {
                 logger.error(e.getStackTrace().toString());

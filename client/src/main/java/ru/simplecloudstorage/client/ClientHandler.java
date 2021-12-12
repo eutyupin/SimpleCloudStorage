@@ -129,10 +129,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
             try(RandomAccessFile downloadedFile = new RandomAccessFile(downloadFileCommand.getDestinationPath(), "rw")) {
                 downloadedFile.seek(downloadFileCommand.getStartPosition());
                 downloadedFile.write(downloadFileCommand.getContent());
-                mainWindow.downloadButton.setDisable(true);
-                mainWindow.uploadButton.setDisable(true);
+                mainWindow.getDownloadButton().setDisable(true);
+                mainWindow.getUploadButton().setDisable(true);
                 percentage = (double) downloadFileCommand.getStartPosition() / (double) downloadFileCommand.getTotalFileLength();
-                mainWindow.progressBar.setProgress(percentage);
+                mainWindow.getProgressBar().setProgress(percentage);
             } catch (IOException e) {
                 logger.error(e.getStackTrace().toString());
                 Platform.runLater(() -> {
@@ -140,9 +140,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
                 });
             }
             if (downloadFileCommand.isEndOfFile()) {
-                mainWindow.downloadButton.setDisable(false);
-                mainWindow.uploadButton.setDisable(false);
-                mainWindow.progressBar.setProgress(0);
+                mainWindow.getDownloadButton().setDisable(false);
+                mainWindow.getUploadButton().setDisable(false);
+                mainWindow.getProgressBar().setProgress(0);
                 application.getMainWindow().setRightView();
                 logger.info(String.format("Command %s received. Total %d bytes received",
                         downloadFileCommand.getClass().getSimpleName(), downloadFileCommand.getTotalFileLength()));

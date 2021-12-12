@@ -3,7 +3,7 @@ package ru.simplecloudstorage.commands;
 public class RegisterCommand extends BaseCommand{
 
     private String login, email;
-    private int passwordHash;
+    private String password;
 
     public RegisterCommand() {
         super(CommandType.REGISTER);
@@ -13,8 +13,8 @@ public class RegisterCommand extends BaseCommand{
         return login;
     }
 
-    public int getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
     public String getEmail() {
@@ -25,8 +25,8 @@ public class RegisterCommand extends BaseCommand{
         this.login = login;
     }
 
-    public void setPasswordHash(int passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setEmail(String email) {
