@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.simplecloudstorage</groupId>
     <artifactId>client</artifactId>
-    <version>1.08T</version>
+    <version>1.081</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
@@ -29,13 +29,13 @@
         <dependency>
             <groupId>ru.simplecloudstorage</groupId>
             <artifactId>commands</artifactId>
-            <version>1.08</version>
+            <version>1.081</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ru.simplecloudstorage</groupId>
             <artifactId>server</artifactId>
-            <version>1.08</version>
+            <version>1.081</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

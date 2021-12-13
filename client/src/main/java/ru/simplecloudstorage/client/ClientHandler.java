@@ -72,8 +72,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
         }
         if (command.getType().equals(CommandType.AUTH_FAILED)) {
             AuthFailedCommand authFailedCommand = (AuthFailedCommand) command;
-            logger.info(String.format("Command %s received. Authorization failed with message %s"),
-                    authFailedCommand.getClass().getSimpleName(), authFailedCommand.getMessage());
+            logger.info(String.format("Command %s received. Authorization failed with message %s",
+                    authFailedCommand.getClass().getSimpleName(), authFailedCommand.getMessage()));
             Platform.runLater(() -> {
                 new ErrorDialog(ERROR, ERROR_TITLE, authFailedCommand.getMessage());
                 application.getAuthDialog().prepareFieldsForLogin();
