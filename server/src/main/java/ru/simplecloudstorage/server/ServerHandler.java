@@ -165,7 +165,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private void checkUploadFileCommand(BaseCommand command, ChannelHandlerContext ctx) {
         if (command.getType().equals(CommandType.UPLOAD_FILE)) {
             UploadFileCommand uploadFileCommand = (UploadFileCommand) command;
-            String path = APP_ROOT_PATH + uploadFileCommand.getFilePath();
+            String path = ServerUserUtils.checkDirectory(APP_ROOT_PATH + uploadFileCommand.getPath());
+            path += uploadFileCommand.getFileName();
             try(RandomAccessFile uploadFile = new RandomAccessFile(path, "rw")) {
                 uploadFile.seek(uploadFileCommand.getStartPosition());
                 uploadFile.write(uploadFileCommand.getContent());
@@ -188,14 +189,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
             DownloadRequestCommand downloadRequestCommand = (DownloadRequestCommand) command;
             logger.info(String.format("Command %s received. Path to download: %s ",
                     downloadRequestCommand.getClass().getSimpleName(), APP_ROOT_PATH +
-                            downloadRequestCommand.getPath()));
+                            downloadRequestCommand.getServerPath()));
             executor.execute(() -> fileDownloadProcess(downloadRequestCommand, (ctx)));
 
         }
     }
 
     private void fileDownloadProcess(DownloadRequestCommand downloadRequestCommand, ChannelHandlerContext ctx) {
-        String path = APP_ROOT_PATH + downloadRequestCommand.getPath();
+        String path = APP_ROOT_PATH + downloadRequestCommand.getServerPath();
         DownloadFileCommand downloadFileCommand = new DownloadFileCommand();
         if(Files.isRegularFile(Path.of(path))) {
             try (RandomAccessFile requestedFile = new RandomAccessFile(path, "r")) {
@@ -214,9 +215,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                     }
                     requestedFile.read(bytes);
 
-                    downloadFileCommand.setDestinationPath(downloadRequestCommand.getDestinationPath() +
-                            downloadRequestCommand.getPath().substring(downloadRequestCommand.getPath().lastIndexOf(File.separator),
-                                    downloadRequestCommand.getPath().length()));
+                    downloadFileCommand.setPath(downloadRequestCommand.getDestinationPath());
+                    downloadFileCommand.setFileName(downloadRequestCommand.getServerPath().substring(
+                            downloadRequestCommand.getServerPath().lastIndexOf(File.separator)));
                     downloadFileCommand.setTotalFileLength(fileLength);
                     downloadFileCommand.setStartPosition(position);
                     downloadFileCommand.setContent(bytes);
@@ -224,7 +225,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
                     ctx.writeAndFlush(downloadFileCommand).sync();
                     if (endOfFile) {
                         logger.info(String.format("File downloaded to client. Path to download: %s Total %d bytes",
-                                APP_ROOT_PATH + downloadRequestCommand.getPath(),
+                                APP_ROOT_PATH + downloadRequestCommand.getServerPath(),
                                 fileLength));
                     }
                 } while (requestedFile.getFilePointer() < requestedFile.length());

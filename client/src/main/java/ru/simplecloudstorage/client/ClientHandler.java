@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.controllers.MainWindow;
+import ru.simplecloudstorage.utils.ClientUserUtils;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
@@ -18,6 +19,9 @@ import ru.simplecloudstorage.utils.SceneName;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -127,7 +131,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
         double percentage = 0.0;
         if (command.getType().equals(CommandType.DOWNLOAD_FILE)) {
             DownloadFileCommand downloadFileCommand = (DownloadFileCommand) command;
-            try(RandomAccessFile downloadedFile = new RandomAccessFile(downloadFileCommand.getDestinationPath(), "rw")) {
+            String path = ClientUserUtils.checkDirectory(downloadFileCommand.getPath());
+            path += downloadFileCommand.getFileName();
+            try(RandomAccessFile downloadedFile = new RandomAccessFile(path, "rw")) {
                 downloadedFile.seek(downloadFileCommand.getStartPosition());
                 downloadedFile.write(downloadFileCommand.getContent());
                 mainWindow.getDownloadButton().setDisable(true);

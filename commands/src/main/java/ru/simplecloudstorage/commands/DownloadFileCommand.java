@@ -6,7 +6,8 @@ public class DownloadFileCommand extends BaseCommand {
     private byte[] content;
     private long startPosition;
     private boolean endOfFile = false;
-    private String destinationPath;
+    private String path;
+    private String fileName;
 
     public DownloadFileCommand() {
         super(CommandType.DOWNLOAD_FILE);
@@ -44,11 +45,19 @@ public class DownloadFileCommand extends BaseCommand {
         this.totalFileLength = totalFileLength;
     }
 
-    public String getDestinationPath() {
-        return destinationPath;
+    public String getPath() {
+        return path;
     }
 
-    public void setDestinationPath(String destinationPath) {
-        this.destinationPath = destinationPath;
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public  class ServerUserUtils {
     private static final Logger logger = LogManager.getLogger(ServerUserUtils.class);
@@ -57,5 +58,15 @@ public  class ServerUserUtils {
         }
         logger.info("Directory created: " + path.toString());
         return true;
+    }
+
+    public static String checkDirectory(String destinationPath) {
+        String resultPath = "";
+        if (Files.isDirectory(Path.of(destinationPath))) {
+            return destinationPath;
+        } else if (Files.isRegularFile(Path.of(destinationPath))) {
+            resultPath = Paths.get(destinationPath).getParent().toString();
+        }
+        return resultPath;
     }
 }

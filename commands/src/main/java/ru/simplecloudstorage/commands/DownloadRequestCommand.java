@@ -2,19 +2,19 @@ package ru.simplecloudstorage.commands;
 
 public class DownloadRequestCommand extends BaseCommand {
 
-    private String path;
+    private String serverPath;
     private String destinationPath;
 
     public DownloadRequestCommand() {
         super(CommandType.DOWNLOAD_REQUEST);
     }
 
-    public String getPath() {
-        return path;
+    public String getServerPath() {
+        return serverPath;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setServerPath(String path) {
+        this.serverPath = path;
     }
 
     public String getDestinationPath() {

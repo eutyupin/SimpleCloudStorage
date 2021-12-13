@@ -105,7 +105,7 @@ public class MainWindow implements Initializable {
     private void uploadAction(ActionEvent actionEvent) {
         if (!clientPath.isEmpty() && !serverPath.isEmpty()) {
             if(Files.isRegularFile(Path.of(clientPath))) {
-                clientSender.fileUploadToServer(clientPath, serverPath +
+                clientSender.fileUploadToServer(clientPath, serverPath,
                         clientPath.substring(clientPath.lastIndexOf(File.separator),
                                 clientPath.length()));
             }

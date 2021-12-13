@@ -6,7 +6,8 @@ public class UploadFileCommand extends BaseCommand {
     private byte[] content;
     private long startPosition;
     private boolean endOfFile = false;
-    private String filePath;
+    private String path;
+    private String fileName;
 
     public UploadFileCommand() {
         super(CommandType.UPLOAD_FILE);
@@ -44,11 +45,19 @@ public class UploadFileCommand extends BaseCommand {
         this.totalFileLength = totalFileLength;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }

@@ -8,6 +8,7 @@ import ru.simplecloudstorage.commands.DownloadRequestCommand;
 import ru.simplecloudstorage.commands.NewDirectoryCommand;
 import ru.simplecloudstorage.commands.UploadFileCommand;
 import ru.simplecloudstorage.controllers.MainWindow;
+import ru.simplecloudstorage.utils.ClientUserUtils;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -32,18 +33,18 @@ public class ClientSender {
         clientChannel.writeAndFlush(newDirectoryCommand);
     }
 
-    public void fileUploadToServer(String path, String destinationPath) {
-        threadPool.execute(() -> fileUploadProcess(path, destinationPath));
+    public void fileUploadToServer(String path, String destinationPath, String fileName) {
+        threadPool.execute(() -> fileUploadProcess(path, destinationPath, fileName));
     }
 
     public void fileDownloadFromServer(String path, String destinationPath) {
         DownloadRequestCommand downloadRequestCommand = new DownloadRequestCommand();
-        downloadRequestCommand.setPath(path);
-        downloadRequestCommand.setDestinationPath(destinationPath);
+        downloadRequestCommand.setServerPath(path);
+        downloadRequestCommand.setDestinationPath(ClientUserUtils.checkDirectory(destinationPath));
         clientChannel.writeAndFlush(downloadRequestCommand);
     }
 
-    private void fileUploadProcess(String path, String destinationPath) {
+    private void fileUploadProcess(String path, String destinationPath, String fileName) {
         double percentage = 0.0;
         UploadFileCommand uploadFileCommand = new UploadFileCommand();
         try (RandomAccessFile uploadedFile = new RandomAccessFile(path, "r")) {
@@ -64,7 +65,8 @@ public class ClientSender {
                 uploadFileCommand.setTotalFileLength(fileLength);
                 uploadFileCommand.setStartPosition(position);
                 uploadFileCommand.setContent(bytes);
-                uploadFileCommand.setFilePath(destinationPath);
+                uploadFileCommand.setPath(destinationPath);
+                uploadFileCommand.setFileName(fileName);
                 uploadFileCommand.setEndOfFile(endOfFile);
                 clientChannel.writeAndFlush(uploadFileCommand).sync();
                 percentage = (double) position / (double) fileLength;
