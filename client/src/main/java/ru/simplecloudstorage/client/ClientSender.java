@@ -1,13 +1,14 @@
 package ru.simplecloudstorage.client;
 
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.commands.DeleteCommand;
 import ru.simplecloudstorage.commands.DownloadRequestCommand;
 import ru.simplecloudstorage.commands.NewDirectoryCommand;
 import ru.simplecloudstorage.commands.UploadFileCommand;
 import ru.simplecloudstorage.controllers.MainWindow;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +19,7 @@ public class ClientSender {
     private final ExecutorService threadPool;
     private static final int BUFFER_SIZE = 256 * 1024;
     private MainWindow mainWindow;
-    private static final Logger logger = LoggerFactory.getLogger(ClientSender.class);
+    private static final Logger logger = LogManager.getLogger(ClientSender.class);
 
     public ClientSender(Channel clientChannel) {
         this.clientChannel = clientChannel;

@@ -9,8 +9,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.network.CustomFileDecoder;
 import ru.simplecloudstorage.network.CustomFileEncoder;
 
@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 public class ServerConnector {
     private static int port;
     private static final int DEFAULT_PORT_VALUE = 8189;
-    private static final Logger logger = LoggerFactory.getLogger(ServerConnector.class);
+    private static final Logger logger = LogManager.getLogger(ServerConnector.class);
 
     public void run() throws InterruptedException {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);

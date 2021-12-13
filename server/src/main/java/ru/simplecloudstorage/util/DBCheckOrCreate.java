@@ -1,7 +1,7 @@
 package ru.simplecloudstorage.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +11,7 @@ import java.sql.Statement;
 public class DBCheckOrCreate {
 
     private  static Statement checkStatement;
-    private static final Logger logger = LoggerFactory.getLogger(DBCheckOrCreate.class);
+    private static final Logger logger = LogManager.getLogger(DBCheckOrCreate.class);
 
     public static void tryCheckOrCreate(String dbURL) throws SQLException {
         try (Connection checkConnection = DriverManager.getConnection(dbURL)) {

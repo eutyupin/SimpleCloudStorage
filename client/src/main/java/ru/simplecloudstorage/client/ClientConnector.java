@@ -9,8 +9,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import javafx.application.Platform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.commands.AuthCommand;
 import ru.simplecloudstorage.commands.RegisterCommand;
@@ -27,7 +27,7 @@ public class ClientConnector {
     private ClientSender clientSender;
     private ClientApp application;
     private boolean normalCloseApplication = false;
-    private static final Logger logger = LoggerFactory.getLogger(ClientConnector.class);
+    private static final Logger logger = LogManager.getLogger(ClientConnector.class);
 
     public void run() {
 

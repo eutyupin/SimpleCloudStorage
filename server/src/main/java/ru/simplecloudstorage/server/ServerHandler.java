@@ -3,12 +3,13 @@ package ru.simplecloudstorage.server;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.services.AuthorizeService;
 import ru.simplecloudstorage.services.RegisterService;
 import ru.simplecloudstorage.util.ServerUserUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 
 @ChannelHandler.Sharable
 public class ServerHandler extends SimpleChannelInboundHandler<BaseCommand> {
-    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
+    private static final Logger logger = LogManager.getLogger(ServerHandler.class);
     private final String APP_ROOT_PATH = Paths.get("./").toAbsolutePath().normalize().toString() + File.separator;
     private final String APP_ROOT_URI = Paths.get("./").toUri().normalize().toString().substring(6);
     private final String DB_URL = "jdbc:sqlite:" + APP_ROOT_URI + "base.db";

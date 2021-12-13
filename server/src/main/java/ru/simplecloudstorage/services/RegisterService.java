@@ -1,7 +1,7 @@
 package ru.simplecloudstorage.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.commands.BaseCommand;
 import ru.simplecloudstorage.commands.RegisterFailedCommand;
 import ru.simplecloudstorage.commands.RegisterOkCommnad;
@@ -14,7 +14,7 @@ import java.sql.Statement;
 
 public class RegisterService {
     private Statement registerStatement;
-    private static final Logger logger = LoggerFactory.getLogger(RegisterService.class);
+    private static final Logger logger = LogManager.getLogger(RegisterService.class);
 
     public BaseCommand tryRegister(String login, int passwordHash, String email, String dbURL) throws SQLException {
         DBCheckOrCreate.tryCheckOrCreate(dbURL);

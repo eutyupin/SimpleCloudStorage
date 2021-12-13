@@ -6,14 +6,15 @@ import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.commands.*;
 import ru.simplecloudstorage.controllers.MainWindow;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.InformationDialog;
 import ru.simplecloudstorage.utils.SceneName;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -28,7 +29,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<BaseCommand> {
     private final String REGISTER = "Регистрация";
     private final String REGISTER_TITLE = "Регистрация прошла успешно!";
     private final String REGISTER_TEXT = "Попробуйте авторизоваться используя форму авторизации";
-    private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+    private static final Logger logger = LogManager.getLogger(ClientHandler.class);
 
     private ClientApp application;
     private MainWindow mainWindow;

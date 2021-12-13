@@ -1,7 +1,7 @@
 package ru.simplecloudstorage.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.commands.AuthFailedCommand;
 import ru.simplecloudstorage.commands.AuthOkCommand;
 import ru.simplecloudstorage.commands.BaseCommand;
@@ -19,7 +19,7 @@ public class AuthorizeService {
     private ResultSet resultSet;
     private String programRootPath = Paths.get("./").toUri().normalize().toString().substring(6);
     private ExecutorService dbWorkThreadPool = Executors.newSingleThreadExecutor();
-    private static final Logger logger = LoggerFactory.getLogger(AuthorizeService.class);
+    private static final Logger logger = LogManager.getLogger(AuthorizeService.class);
 
     public BaseCommand tryAuthorize(String login, int passwordHash, String dbURL) throws SQLException {
         dbCheckOrCreate(dbURL);

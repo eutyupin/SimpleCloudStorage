@@ -8,9 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.apache.log4j.PropertyConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.client.ClientConnector;
 import ru.simplecloudstorage.client.ClientSender;
 import ru.simplecloudstorage.controllers.AuthDialog;
@@ -18,6 +17,7 @@ import ru.simplecloudstorage.controllers.MainWindow;
 import ru.simplecloudstorage.controllers.NewFolderDialog;
 import ru.simplecloudstorage.utils.ErrorDialog;
 import ru.simplecloudstorage.utils.SceneName;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,7 +26,7 @@ public class ClientApp extends Application {
 
     private static final int DEFAULT_PORT_VALUE = 8189;
     private static final String DEFAULT_HOST_VALUE = "localhost";
-    private static final Logger logger = LoggerFactory.getLogger(ClientApp.class);
+    private static final Logger logger = LogManager.getLogger(ClientApp.class);
 
     private static Scene scene;
     private static Stage primaryStage;
@@ -58,7 +58,6 @@ public class ClientApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        PropertyConfigurator.configure("src/main/resources/log4jClient.properties");
         mainWorkPool = Executors.newSingleThreadExecutor();
         primaryStage = stage;
         scene = new Scene(loadFXML(SceneName.MAIN_WINDOW.getValue()));

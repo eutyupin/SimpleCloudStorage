@@ -13,11 +13,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.simplecloudstorage.ClientApp;
 import ru.simplecloudstorage.client.ClientSender;
 import ru.simplecloudstorage.utils.InformationDialog;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -33,7 +34,7 @@ public class MainWindow implements Initializable {
     private String serverPath;
     private String clientPath;
     private double pr = 0;
-    private static final Logger logger = LoggerFactory.getLogger(MainWindow.class);
+    private static final Logger logger = LogManager.getLogger(MainWindow.class);
 
     @FXML
     private ProgressBar progressBar;
